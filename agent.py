@@ -13,10 +13,10 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from pydantic import SecretStr
 
-import agent.tools as Tools
-import agent.prompts as PROMPTS
-import agent.nodes as NODES
-import agent.logger as Logger
+import agent_src.tools as Tools
+import agent_src.prompts as PROMPTS
+import agent_src.nodes as NODES
+import agent_src.logger as Logger
 
 class Agent():
     def __init__(self):

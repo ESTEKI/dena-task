@@ -3,3 +3,5 @@ numpy
 langgraph
 dotenv
 langchain_openai
+fastapi
+uvicorn
