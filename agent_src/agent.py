@@ -19,17 +19,17 @@ class Agent():
         checkpointer = InMemorySaver()
         
         graph_builder = StateGraph(Nodes.AppState)
-        graph_builder.add_node("chatbot",Nodes.chat)
+        graph_builder.add_node("orchestrator",Nodes.orchestrator)
         #graph_builder.add_node("tools", self.nodes.tool_node)
-        graph_builder.add_edge(START, "chatbot")
+        graph_builder.add_edge(START, "orchestrator")
         # graph_builder.add_conditional_edges(
-        #     "chatbot",
+        #     "orchestrator",
         #     self.nodes.should_continue,
         #     {"tools": "tools", "end": END}
         # )
         # graph_builder.add_edge("tools", "chatbot")
 
-        #graph_builder.add_edge("chatbot",END)
+        graph_builder.add_edge("orchestrator",END)
 
         self.graph = graph_builder.compile(checkpointer = checkpointer)
         self.logger.log(f"Graph compiled successfully.","Agent")
