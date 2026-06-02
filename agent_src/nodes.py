@@ -11,13 +11,13 @@ import agent_src.logger as Logger
 class AppState(TypedDict):
             user_msg: str
             messages: Annotated[list, add_messages]
-            user_intent: Optional[Literal["Statistics", "Analytical", "Search", "Operation"]]
+            user_intent: Optional[Literal["Statistics", "Analytical", "Search", "Operation","None"]]
 
 logger = Logger.LoggerManager("nodes")
 
 def orchestrator(state: AppState):
         """
-        Classifier node that determines the action 
+        Classifier node that determines the action based on last 2 messages in the conversation history. It uses a structured output llm call to determine the user intent and route to the correct node in the graph.
         """
         llm = llms.llm_openai
         str_llm = llm.with_structured_output(basemodels.OrchestratorClassification)
@@ -44,18 +44,12 @@ def orchestrator(state: AppState):
             formatted_prompt = Prompts.orchestrator_prompt.replace("{conversation_history}", "failed to load history!")
             messages = [HumanMessage(content=formatted_prompt)]
 
-        response = str_llm.invoke(messages)
+        try:
+            response = str_llm.invoke(messages)
+        except Exception as e:
+            logger.log(f"Error in API call to LLM service. msg: {e}", level="critical")
+            return {"user_intent": "None"}
         
-        # # Normalize response.content to a simple string
-        # if isinstance(response.content, list):
-        #     extracted = []
-        #     for item in response.content:
-        #         if isinstance(item, dict) and "text" in item:
-        #             extracted.append(item["text"])
-        #     content_text = " ".join(extracted)
-        # else:
-        #     content_text = str(response.content).strip()
-        #return {"messages": [response]}
         return {"user_intent": response.intent}
 
 def chat(state: AppState):

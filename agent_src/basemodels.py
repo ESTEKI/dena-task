@@ -11,7 +11,7 @@ class OrchestratorClassification(BaseModel):
     - Statistics, Analytical, Search, Operation
     
     """
-    intent: Literal["Statistics", "Analytical", "Search", "Operation"] = Field(
+    intent: Literal["Statistics", "Analytical", "Search", "Operation","None"] = Field(
         ...,
         description="The classified intent of the user input."
     )
