@@ -30,37 +30,43 @@ class ColoredFormatter(logging.Formatter):
             return formatted
         
 class LoggerManager:
-        def __init__(self, log_filename: str, level=logging.INFO):
-            if not log_filename.endswith(".log"):
-                log_filename += ".log"
-            log_path = os.path.join("logs", log_filename)
-            os.makedirs(os.path.dirname(log_path), exist_ok=True)
+    def __init__(self, log_filename: str, level=logging.INFO):
+        if not log_filename.endswith(".log"):
+            log_filename += ".log"
 
-            self.logger = logging.getLogger("shared_logger")
-            self.logger.setLevel(level)
-            self.logger.propagate = False
+        log_path = os.path.join("logs", log_filename)
+        os.makedirs(os.path.dirname(log_path), exist_ok=True)
 
-            plain_formatter = logging.Formatter("%(asctime)s [%(dynamic_name)s] [%(levelname)s] %(message)s")
+        # IMPORTANT: unique logger per file
+        self.logger = logging.getLogger(log_filename)
+        self.logger.setLevel(level)
+        self.logger.propagate = False
 
-            if not self.logger.handlers:
-                file_handler = logging.FileHandler(log_path, encoding="utf-8")
-                file_handler.setFormatter(plain_formatter)
+        plain_formatter = logging.Formatter(
+            "%(asctime)s [%(dynamic_name)s] [%(levelname)s] %(message)s"
+        )
 
-                stream_handler = logging.StreamHandler(sys.stdout)
-                stream_handler.setFormatter(ColoredFormatter())
+        if not self.logger.handlers:
+            file_handler = logging.FileHandler(log_path, encoding="utf-8")
+            file_handler.setFormatter(plain_formatter)
 
-                self.logger.addHandler(file_handler)
-                self.logger.addHandler(stream_handler)
+            stream_handler = logging.StreamHandler(sys.stdout)
+            stream_handler.setFormatter(ColoredFormatter())
 
-        def log(self, message: str, name: str = "default", level: str = "info"):
-            extra = {"dynamic_name": name}
-            if level == "debug":
-                self.logger.debug(message, extra=extra)
-            elif level == "warning":
-                self.logger.warning(message, extra=extra)
-            elif level == "error":
-                self.logger.error(message, extra=extra)
-            elif level == "critical":
-                self.logger.critical(message, extra=extra)
-            else:
-                self.logger.info(message, extra=extra)
+            self.logger.addHandler(file_handler)
+            self.logger.addHandler(stream_handler)
+
+    def log(self, message: str, name: str = "default", level: str = "info"):
+        extra = {"dynamic_name": name}
+        level = level.lower()
+
+        if level == "debug":
+            self.logger.debug(message, extra=extra)
+        elif level == "warning":
+            self.logger.warning(message, extra=extra)
+        elif level == "error":
+            self.logger.error(message, extra=extra)
+        elif level == "critical":
+            self.logger.critical(message, extra=extra)
+        else:
+            self.logger.info(message, extra=extra)

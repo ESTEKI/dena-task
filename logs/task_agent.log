@@ -4,3 +4,7 @@
 2026-06-02 19:04:44,893 [Agent] [INFO] Graph compiled successfully.
 2026-06-02 20:30:36,625 [Agent] [INFO] Graph compiled successfully.
 2026-06-02 20:37:32,191 [Agent] [INFO] Graph compiled successfully.
+2026-06-04 01:00:00,831 [Agent] [INFO] Graph compiled successfully.
+2026-06-04 01:03:31,234 [Agent] [INFO] Graph compiled successfully.
+2026-06-04 01:40:21,513 [Agent] [INFO] Graph compiled successfully.
+2026-06-04 01:40:26,864 [Agent] [INFO] Graph response: {'messages': [HumanMessage(content='تسکهای باز محمد رضایی را نشان بده', additional_kwargs={}, response_metadata={}, id='4abb1b17-8380-43f5-9ac3-2b9447e16b54')], 'user_intent': 'Search', 'search_criteria': {'status': 'Open', 'fullname': 'محمد رضایی'}}

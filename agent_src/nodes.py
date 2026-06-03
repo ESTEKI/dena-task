@@ -14,7 +14,7 @@ class AppState(TypedDict):
             user_intent: Optional[Literal["Statistics", "Analytical", "Search", "Operation","None"]]
             search_criteria: Optional[Dict[str, Any]]
 
-logger = Logger.LoggerManager("nodes")
+#logger_nodes = Logger.LoggerManager("nodes")
 
 def orchestrator(state: AppState):
         """
@@ -39,17 +39,17 @@ def orchestrator(state: AppState):
 
             formatted_prompt = Prompts.orchestrator_prompt.replace("{conversation_history}", str(last_msgs_history))
 
-            logger.log(f"Formatted prompt for orchestrator:\n{formatted_prompt}", level="debug")
+            #logger_nodes.log(f"Formatted prompt for orchestrator:\n{formatted_prompt}", level="debug")
             messages = [HumanMessage(content=formatted_prompt)]
         except Exception as e:
-            logger.log(f"Exception while building messages: {e}", level="critical")
+            #logger_nodes.log(f"Exception while building messages: {e}", level="critical")
             formatted_prompt = Prompts.orchestrator_prompt.replace("{conversation_history}", "failed to load history!")
             messages = [HumanMessage(content=formatted_prompt)]
 
         try:
             response = str_llm.invoke(messages)
         except Exception as e:
-            logger.log(f"Error in API call to LLM service. msg: {e}", level="critical")
+            #logger_nodes.log(f"Error in API call to LLM service. msg: {e}", level="critical")
             return {"user_intent": "None"}
         
         return {"user_intent": response.intent}
@@ -71,16 +71,16 @@ def search_node(state: AppState):
 
             formatted_prompt = Prompts.search_node_prompt.replace("{conversation_history}", str(last_msgs_history))
 
-            logger.log(f"Formatted prompt for search node:\n{formatted_prompt}", level="debug")
+            #logger_nodes.log(f"Formatted prompt for search node:\n{formatted_prompt}", level="debug",name="search_node")
             messages = [HumanMessage(content=formatted_prompt)]
         except Exception as e:
-            logger.log(f"Exception while building messages for search node: {e}", level="critical")
+            #logger_nodes.log(f"Exception while building messages for search node: {e}", level="critical")
             formatted_prompt = Prompts.search_node_prompt.replace("{conversation_history}", "failed to load history!")
             messages = [HumanMessage(content=formatted_prompt)]
         try:
             response = str_llm.invoke(messages)
         except Exception as e:
-            logger.log(f"Error in API call to LLM service for search node. msg: {e}", level="critical")
+            #logger_nodes.log(f"Error in API call to LLM service for search node. msg: {e}", level="critical")
             return {"search_criteria": {}}
         return {"search_criteria": response.dict(exclude_none=True)}
 
@@ -99,6 +99,7 @@ def chat(state: AppState):
             content_text = " ".join(extracted)
         else:
             content_text = str(response.content).strip()
+        #logger_nodes.log(f"Chat response: {content_text}", level="debug", name="chat")
         return {"messages": [content_text]}
 
 def should_continue(state: AppState):

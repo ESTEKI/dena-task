@@ -57,19 +57,14 @@ class Agent():
         """Invokes the graph with user input and returns a structured response."""
         config = {"configurable": {"thread_id": userID}}
         initial_state = {
-            "user_message": user_input,
+            "user_message": user_input, # might be usefull somewhere in the future. 
             "messages": [
                 HumanMessage(content=user_input)
             ]
         }
 
         response = self.graph.invoke(initial_state, config)
-
-        # #try:
-        # response_data = response.get('response_json', '{}')
-        # data = response_data.get('response', {}).get('data', {})
-
-
+        self.logger.log(f"Graph response: {response}", "Agent")
         return response
 
         # except (json.JSONDecodeError, KeyError) as e:
