@@ -51,3 +51,56 @@ You should only output the category name without any explanation. The category n
 
 
 """
+
+search_node_prompt = """ you are responsible to handle user queries related to searching for specific information in a ticketing system database. 
+پایگاه داده شامل ستون های زیر است:
+id	title	description	create_time	status	assignee_id	priority	due_time	fullname	department
+وظیفه تو این است که مشخص کنی کاربر کدامیک از موارد بالا را در درخواست خود میخواهد جستجو کند و پاسخ مناسب را برگردانی.
+Valid values:
+- status: Done | In Progress | Review | Open
+- priority: High | Medium | Critical | Low
+- department: فنی | محصول | مالی | پشتیبانی | مدیریت | استقرار
+
+ در ادامه چند نمونه از سوالاتی که ممکن است کاربر بپرسد را میبینیم:
+- تیکت های مربوط به علی صابری را نشان بده
+You should output a JSON object with the following format:
+If a field is not mentioned, return null for it.
+
+Return ONLY a valid JSON object in the following format:
+
+{
+  "create_time": null,
+  "status": null,
+  "priority": null,
+  "due_time": null,
+  "fullname": null,
+  "department": null
+}
+
+### Examples:
+
+User: تیکت های مربوط به علی صابری را نشان بده
+Output:
+{
+  "fullname": "علی صابری",
+  "create_time": null,
+  "status": null,
+  "priority": null,
+  "due_time": null,
+  "department": null
+}
+
+User: تیکت های بخش پشتیبانی با اولویت بالا
+Output:
+{
+  "department": "پشتیبانی",
+  "priority": "High",
+  "create_time": null,
+  "status": null,
+  "due_time": null,
+  "fullname": null
+}
+
+Here is the conversation history that you receive:
+{conversation_history}
+"""
