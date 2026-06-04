@@ -14,3 +14,14 @@
 2026-06-04 16:35:54,187 [Agent] [INFO] Graph compiled successfully.
 2026-06-04 16:36:01,724 [Agent] [INFO] Graph response: {'messages': [HumanMessage(content='تسکهای باز محمد رضایی را نشان بده', additional_kwargs={}, response_metadata={}, id='71b87faa-18fe-4f48-a4db-a16401fe0409')], 'user_intent': 'Search', 'search_criteria': {'status': 'Open', 'fullname': 'محمد رضایی'}}
 2026-06-04 16:37:39,752 [Agent] [INFO] Graph response: {'messages': [HumanMessage(content='تسکهای باز محمد رضایی را نشان بده', additional_kwargs={}, response_metadata={}, id='71b87faa-18fe-4f48-a4db-a16401fe0409'), HumanMessage(content='چند تسک حیاتی تو دوماه گذشته داریم؟', additional_kwargs={}, response_metadata={}, id='0b1c234c-7b46-4ec4-9124-580205d63c44')], 'user_intent': 'Statistics', 'search_criteria': {}}
+2026-06-04 16:39:46,392 [Agent] [INFO] Graph compiled successfully.
+2026-06-04 16:39:54,148 [Agent] [INFO] Graph response: {'messages': [HumanMessage(content='چند تسک حیاتی تو دوماه گذشته داریم؟', additional_kwargs={}, response_metadata={}, id='e187632b-dd4a-4562-9628-b1333108e5aa')], 'user_intent': 'Statistics', 'search_criteria': {'time_window': 'دوماه گذشته', 'priority': 'Critical'}}
+2026-06-04 17:34:46,184 [Agent] [INFO] Graph compiled successfully.
+2026-06-04 17:37:03,226 [Agent] [INFO] Graph compiled successfully.
+2026-06-04 17:37:12,538 [Agent] [INFO] Graph response: {'messages': [HumanMessage(content='تسکهای باز محمد رضایی را نشان بده', additional_kwargs={}, response_metadata={}, id='b04b102f-ff48-472c-a585-a793ba5702ba')], 'user_intent': 'Search', 'search_criteria': {'status': 'Open', 'fullname': 'محمد رضایی'}}
+2026-06-04 17:37:58,897 [Agent] [INFO] Graph compiled successfully.
+2026-06-04 17:41:35,975 [Agent] [INFO] Graph compiled successfully.
+2026-06-04 17:41:43,133 [Agent] [INFO] Graph response: {'messages': [HumanMessage(content='چند تسک حیاتی تو دوماه گذشته داریم؟', additional_kwargs={}, response_metadata={}, id='0a44f91d-8cff-4cb3-807a-b7b42936af8c')], 'user_intent': 'Statistics', 'search_criteria': {'time_window': 'دوماه گذشته', 'priority': 'Critical'}, 'time_window': {'days': 0, 'months': 0, 'years': 0}}
+2026-06-04 17:44:11,388 [Agent] [INFO] Graph compiled successfully.
+2026-06-04 17:44:21,431 [Agent] [INFO] Graph response: {'messages': [HumanMessage(content='چند تسک حیاتی تو دوماه گذشته داریم؟', additional_kwargs={}, response_metadata={}, id='d132f95c-ba59-4409-b924-e34dbe212c33')], 'user_intent': 'Statistics', 'search_criteria': {'time_window': 'دوماه گذشته', 'priority': 'Critical'}, 'time_window': {'days': 0, 'months': 0, 'years': 0}}
+2026-06-04 17:47:21,106 [Agent] [INFO] Graph compiled successfully.

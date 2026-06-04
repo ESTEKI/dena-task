@@ -12,6 +12,7 @@ class AppState(TypedDict):
             messages: Annotated[list, add_messages]
             user_intent: Optional[Literal["Statistics", "Analytical", "Search", "Operation","None"]]
             search_criteria: Optional[Dict[str, Any]]
+            time_window: Optional[str]
 
 
 def orchestrator(state: AppState):
@@ -107,11 +108,37 @@ def statistics_node(state: AppState):
             messages = [HumanMessage(content=formatted_prompt)]
         try:
             response = str_llm.invoke(messages)
+            print(f"LLM response for statistics node:\n{response}")
         except Exception as e:
             print(f"Error in API call to LLM service for statistics node. msg: {e}")
             return {"search_criteria": {}}
         return {"search_criteria": response.dict(exclude_none=True), "user_intent": "Statistics"}
 
+def to_exact_time(state: AppState):
+        """ In this node, we first call the LLm to turn the literal description of time to integers
+        Then, manually calculate the dates and output the exact time window."""
+        llm = llms.llm_openai
+        str_llm = llm.with_structured_output(basemodels.TimeWindowLLMIntOutput)
+        try:  
+            search_criteria = state.get("search_criteria", {})
+            print(f"Search criteria received in time window extractor node:\n{search_criteria}")
+            time_window = search_criteria.get("time_window")
+            print(f"Extracted time window from previous node:\n{time_window}")
+            formatted_prompt = Prompts.time_window_extractor_node_prompt.replace("{conversation_history}", str(time_window))
+
+            print(f"Formatted prompt for time window extractor node:\n{formatted_prompt}")
+            messages = [HumanMessage(content=formatted_prompt)]
+        except Exception as e:
+            print(f"Exception while building messages for time window extractor node: {e}")
+            formatted_prompt = Prompts.time_window_extractor_node_prompt.replace("{conversation_history}", "failed to load history!")
+            messages = [HumanMessage(content=formatted_prompt)]
+        try:
+            response = str_llm.invoke(messages)
+            print(f"LLM response for time window extractor node:\n{response}")
+        except Exception as e:
+            print(f"Error in API call to LLM service for time window extractor node. msg: {e}")
+            return {"time_window": None}
+        return {"time_window": response.dict(exclude_none=True)}
 
 def chat(state: AppState):
         """
@@ -131,6 +158,7 @@ def chat(state: AppState):
         print(f"Chat response: {content_text}")
         return {"messages": [content_text]}
 
+# Conditional edge functions
 def should_continue(state: AppState):
     """
     Routes the flow based on user_intent produced by the orchestrator node.
@@ -151,5 +179,16 @@ def should_continue(state: AppState):
     return intent_map.get(user_intent, "end")
         
         
-
+def is_time_window_extraction_needed(state: AppState):
+    """
+    Checks if the user input requires time window extraction based on the presence of a time window in the search criteria.
+    If the user intent is "Statistics" and there is a time window mentioned in the search criteria, it returns True, otherwise False.
+    """
+    user_intent = state.get("user_intent")
+    search_criteria = state.get("search_criteria", {})
+    
+    if user_intent == "Statistics" and search_criteria.get("time_window"):
+        print("---------Time window extraction needed based on user intent and search criteria.")
+        return "time_window_extractor_node"
+    return "end"
 

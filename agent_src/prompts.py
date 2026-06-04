@@ -226,13 +226,12 @@ Here is the conversation history that you receive:
 
 time_window_extractor_node_prompt = """تو یک مدل هستی که وظیفه داری بازه زمانی ذکر شده توسط کاربر را به تاریخ دقیق تبدیل کنی.
 کاربر ممکن است از عبارات مختلفی برای اشاره به بازه زمانی استفاده کند، مانند "هفته گذشته"، "ماه گذشته"، "سه روز اخیر" و غیره. وظیفه تو این است که این عبارات را به تاریخ دقیق شروع و پایان تبدیل کنی.
-برای مثال:
+خروجی تو باید یک شیء JSON با فرمت زیر باشد:
 {
-    "days" : int
-    "months" : int
+    "days" : int,
+    "months" : int,
     "years" : int
 }
-User: هفته گذشته
 
 Date Extraction Rules:
 
@@ -241,41 +240,68 @@ Recognize relative and fuzzy date expressions.
 Examples:
 
 امروز
-→ create_time_filter = "TODAY"
-
+{
+    "days" : 0,
+    "months" : 0,
+    "years" : 0
+}
 دیروز
-→ create_time_filter = "YESTERDAY"
+{
+    "days" : 1,
+    "months" : 0,
+    "years" : 0
+}
 
 این هفته
-→ create_time_filter = "THIS_WEEK"
-
+{
+    "days" : 7,
+    "months" : 0,
+    "years" : 0
+}
 هفته گذشته
-→ create_time_filter = "LAST_WEEK"
+{
+    "days" : 7,
+    "months" : 0,
+    "years" : 0
+}
 
 این ماه
-→ create_time_filter = "THIS_MONTH"
+{
+    "days" : 0,
+    "months" : 1,
+    "years" : 0
+}
 
 ماه گذشته
-→ create_time_filter = "LAST_MONTH"
+{
+    "days" : 0,
+    "months" : 1,
+    "years" : 0
+}
 
 امسال
-→ create_time_filter = "THIS_YEAR"
+{
+    "days" : 0,
+    "months" : 0,
+    "years" : 1
+}
 
-سال گذشته
-→ create_time_filter = "LAST_YEAR"
-# start_date, end_date (if user mentions a specific time frame like last week or last month, you should use the time_tool to get the exact dates and include them in your response)
-# در ضمن کاربر اگر اشاره به زمان بندی خاصی کرد مثلا یک ماه پیش یا یک هفته اخیر باید ابزار tool زمان بندی رو صدا بزنی و تاریخ دقیق رو ازش بگیری و در پاسخ به سوالات آماری لحاظ کنی.
-# tool name: time_tool
-# tool input: a string representing the time frame mentioned by the user, for example "last week" or "last month"
+دو هفته اخیر
+{
+    "days" : 14,
+    "months" : 0,
+    "years" : 0
+}
 
-# tool output: a JSON object with the following format:
-# {
-#   "start_date": "YYYY-MM-DD",
-#   "end_date": "YYYY-MM-DD"
-# }
-When a relative date is detected:
-1. Store the original phrase in create_time.
-2. Store the normalized value in create_time_filter.
+سه ماه 
+{
+    "days" : 0,
+    "months" : 3,
+    "years" : 0
+}
+
+here is the part of the conversation history that you receive:
+{conversation_history}
 """
 
 

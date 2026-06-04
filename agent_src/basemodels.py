@@ -82,5 +82,35 @@ class StatisticsNodeOutput(BaseModel):
         description="If the user wants to search by department field in the database."
     )
 
+class TimeWindowOutput(BaseModel):
+    """
+    Represents the structured output for a LLM to extract exact time window from user conversation.
+    It is used as the time window extractor node output to determine the exact time window the user wants to analyze in the ticketing system database.
+    """
+    start_time: Optional[str] = Field(
+        None,
+        description="The start time of the time window."
+    )
 
-    
+    end_time: Optional[str] = Field(
+        None,
+        description="The end time of the time window."
+    )
+
+class TimeWindowLLMIntOutput(BaseModel):
+    """
+    Represents the structured output for a LLM to extract exact time by days, months and years from user conversation.
+    It is used in the time window extractor node to then determine the exact time window the user wants to analyze .
+    """
+    days: int = Field(
+        0,
+        description="Number of days in the time window."
+    )
+    months: int = Field(
+        0,
+        description="Number of months in the time window."
+    )
+    years: int = Field(
+        0,
+        description="Number of years in the time window."
+    )
