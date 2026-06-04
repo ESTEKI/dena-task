@@ -13,6 +13,7 @@ class AppState(TypedDict):
             user_intent: Optional[Literal["Statistics", "Analytical", "Search", "Operation","None"]]
             search_criteria: Optional[Dict[str, Any]]
             time_window: Optional[str]
+            search_results: Optional[Dict[str, Any]]
 
 
 def orchestrator(state: AppState):
@@ -145,8 +146,65 @@ def chat(state: AppState):
         """
         general chat node that takes in user input and returns a response from the llm.
         """
-        messages = state.get("messages", [])
-        response = llms.llm_openai.invoke(messages)
+        
+
+        llm = llms.llm_openai
+        #response = llms.llm_openai.invoke(messages)
+
+        messages = state.get("messages", []) 
+        user_intent = state.get("user_intent", "None")
+        search_criteria = state.get("search_criteria",[])
+        time_window = state.get("time_window",[])
+        api_result = None
+
+        # this part should be called with tool calling for better manipulation of returned results.
+        search_results = None
+        try:
+            if search_criteria or time_window:
+                search_results = Utils.call_database_api(search_criteria, time_window)
+                print("API result:", search_results)
+        except Exception as e:
+            print(f"Error calling API: {e}")
+            search_results = {"count": 0, "data": []}
+
+        try:            
+            last_msgs_history = []
+            for message in reversed(messages):
+                if isinstance(message, HumanMessage):
+                    last_msgs_history.append(f"User: {message.content}")
+                elif isinstance(message, AIMessage):
+                    last_msgs_history.append(f"Assistant: {message.content}")
+                if len(last_msgs_history) == 2:
+                    break
+            last_msgs_history.reverse()
+
+            formatted_prompt = Prompts.chat_node_prompt.replace("{conversation_history}", str(last_msgs_history))
+            num_tasks = 0
+
+            if search_results and isinstance(search_results, dict):
+                num_tasks = search_results.get("count", 0)
+
+            if not user_intent or user_intent == "None":
+                user_intent = "Did not understand user intent"
+            elif user_intent == "Statistics":
+                user_intent = f"User is asking for statistics about the ticketing system data. And the total found number is {num_tasks}"
+            formatted_prompt = formatted_prompt.replace("{user_intent}", user_intent)
+            print(f"Formatted prompt for statistics node:\n{formatted_prompt}")
+            messages = [HumanMessage(content=formatted_prompt)]
+        except Exception as e:
+            print(f"Exception while building messages for statistics node: {e}")
+            formatted_prompt = Prompts.statistics_node_prompt.replace("{conversation_history}", "failed to load history!")
+            messages = [HumanMessage(content=formatted_prompt)]
+
+
+        try:
+            response = llm.invoke(messages)
+            print(f"LLM response for chat node:\n{response}")
+        except Exception as e:
+            print(f"Error in API call to LLM service for chat node. msg: {e}")
+            return {"messages": ["error in call to LLM"]}
+        
+
         # Normalize response.content to a simple string
         if isinstance(response.content, list):
             extracted = []
@@ -156,8 +214,11 @@ def chat(state: AppState):
             content_text = " ".join(extracted)
         else:
             content_text = str(response.content).strip()
+        
         print(f"Chat response: {content_text}")
-        return {"messages": [content_text]}
+
+        
+        return {"messages": [content_text] , "search_results": search_results}
 
 # Conditional edge functions
 def should_continue(state: AppState):

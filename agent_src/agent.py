@@ -34,7 +34,7 @@ class Agent():
                 "Analytical": END,
                 "Search": "search_node",
                 "Operation": END,
-                "None": END
+                "None": "chatbot"
             }
         )
 
@@ -47,7 +47,8 @@ class Agent():
             }
         )
 
-        graph_builder.add_edge("time_window_extractor_node", END)
+        graph_builder.add_edge("time_window_extractor_node", "chatbot")
+        graph_builder.add_edge("search_node", "chatbot")
 
         # graph_builder.add_edge("tools", "chatbot")
 

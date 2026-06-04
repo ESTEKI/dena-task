@@ -1,6 +1,6 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-
+import requests
 
 def calculate_date_offset(time_window: dict) -> dict:
     """
@@ -23,3 +23,16 @@ def calculate_date_offset(time_window: dict) -> dict:
         "month": result.month,
         "year": result.year,
     }
+
+def call_database_api(search_criteria, time_window):
+    url = "http://127.0.0.1:8008/search"
+
+    payload = {
+        "search_criteria": search_criteria,
+        "time_window": time_window
+    }
+
+    response = requests.post(url, json=payload, timeout=10)
+    response.raise_for_status()
+    
+    return response.json()
