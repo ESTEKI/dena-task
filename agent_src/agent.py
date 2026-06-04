@@ -21,14 +21,15 @@ class Agent():
         graph_builder = StateGraph(Nodes.AppState)
         graph_builder.add_node("orchestrator",Nodes.orchestrator)
         graph_builder.add_node("search_node",Nodes.search_node)
+        graph_builder.add_node("statistics_node",Nodes.statistics_node)
         graph_builder.add_node("chatbot",Nodes.chat)
-        #graph_builder.add_node("tools", self.nodes.tool_node)
+        #graph_builder.add_node("tools", ٔTools.tool_node)
         graph_builder.add_edge(START, "orchestrator")
         graph_builder.add_conditional_edges(
             "orchestrator",
             Nodes.should_continue,
             {
-                "Statistics": END,
+                "Statistics": "statistics_node",
                 "Analytical": END,
                 "Search": "search_node",
                 "Operation": END,

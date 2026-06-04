@@ -80,7 +80,38 @@ def search_node(state: AppState):
         except Exception as e:
             print(f"Error in API call to LLM service for search node. msg: {e}")
             return {"search_criteria": {}}
-        return {"search_criteria": response.dict(exclude_none=True)}
+        return {"search_criteria": response.dict(exclude_none=True), "user_intent": "Search"}
+
+def statistics_node(state: AppState):
+        llm = llms.llm_openai
+        str_llm = llm.with_structured_output(basemodels.StatisticsNodeOutput)
+        messages = state.get("messages", []) 
+        try:            
+            last_msgs_history = []
+            for message in reversed(messages):
+                if isinstance(message, HumanMessage):
+                    last_msgs_history.append(f"User: {message.content}")
+                elif isinstance(message, AIMessage):
+                    last_msgs_history.append(f"Assistant: {message.content}")
+                if len(last_msgs_history) == 2:
+                    break
+            last_msgs_history.reverse()
+
+            formatted_prompt = Prompts.statistics_node_prompt.replace("{conversation_history}", str(last_msgs_history))
+
+            print(f"Formatted prompt for statistics node:\n{formatted_prompt}")
+            messages = [HumanMessage(content=formatted_prompt)]
+        except Exception as e:
+            print(f"Exception while building messages for statistics node: {e}")
+            formatted_prompt = Prompts.statistics_node_prompt.replace("{conversation_history}", "failed to load history!")
+            messages = [HumanMessage(content=formatted_prompt)]
+        try:
+            response = str_llm.invoke(messages)
+        except Exception as e:
+            print(f"Error in API call to LLM service for statistics node. msg: {e}")
+            return {"search_criteria": {}}
+        return {"search_criteria": response.dict(exclude_none=True), "user_intent": "Statistics"}
+
 
 def chat(state: AppState):
         """

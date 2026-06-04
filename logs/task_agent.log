@@ -9,3 +9,8 @@
 2026-06-04 01:40:21,513 [Agent] [INFO] Graph compiled successfully.
 2026-06-04 01:40:26,864 [Agent] [INFO] Graph response: {'messages': [HumanMessage(content='تسکهای باز محمد رضایی را نشان بده', additional_kwargs={}, response_metadata={}, id='4abb1b17-8380-43f5-9ac3-2b9447e16b54')], 'user_intent': 'Search', 'search_criteria': {'status': 'Open', 'fullname': 'محمد رضایی'}}
 2026-06-04 11:39:16,889 [Agent] [INFO] Graph compiled successfully.
+2026-06-04 11:40:57,505 [Agent] [INFO] Graph compiled successfully.
+2026-06-04 11:41:01,228 [Agent] [INFO] Graph response: {'messages': [HumanMessage(content='تسکهای باز محمد رضایی را نشان بده', additional_kwargs={}, response_metadata={}, id='943528e3-e461-430c-b948-fd8f75b64811')], 'user_intent': 'Search', 'search_criteria': {'status': 'Open', 'fullname': 'محمد رضایی'}}
+2026-06-04 16:35:54,187 [Agent] [INFO] Graph compiled successfully.
+2026-06-04 16:36:01,724 [Agent] [INFO] Graph response: {'messages': [HumanMessage(content='تسکهای باز محمد رضایی را نشان بده', additional_kwargs={}, response_metadata={}, id='71b87faa-18fe-4f48-a4db-a16401fe0409')], 'user_intent': 'Search', 'search_criteria': {'status': 'Open', 'fullname': 'محمد رضایی'}}
+2026-06-04 16:37:39,752 [Agent] [INFO] Graph response: {'messages': [HumanMessage(content='تسکهای باز محمد رضایی را نشان بده', additional_kwargs={}, response_metadata={}, id='71b87faa-18fe-4f48-a4db-a16401fe0409'), HumanMessage(content='چند تسک حیاتی تو دوماه گذشته داریم؟', additional_kwargs={}, response_metadata={}, id='0b1c234c-7b46-4ec4-9124-580205d63c44')], 'user_intent': 'Statistics', 'search_criteria': {}}

@@ -104,3 +104,188 @@ Output:
 Here is the conversation history that you receive:
 {conversation_history}
 """
+
+
+statistics_node_prompt = """تو یک مدل هستی که وظیفه داری سوالات آماری کاربران را پاسخ بدی.
+کاربر در مورد داده های موجود در یک دیتابیس مربوط به سامانه تیکتینگ ticketing است. 
+دو نمونه از سطر موجود در این دیتاست عبارتند از:
+id	title	description	create_time	status	assignee_id	priority	due_time	fullname	department
+0	1	رفع باگ ورود کاربران	بررسی و رفع خطای لاگین در نسخه وب	2026/01/05	Done	1	High	2026/01/08	علی صابری	فنی
+1	2	پیاده سازی API احراز هویت	ایجاد سرویس JWT برای کاربران	2026/01/07	Done	2	Critical	2026/01/15	رضا محمدی	فنی
+
+وظیفه شما این است که به سوالات آماری کاربران پاسخ دهید. سوالات آماری شامل سوالاتی هستند که با چه تعداد یا چند یا چنتا پرسیده میشوند.
+وظیفه تو این است که مشخص کنی کاربر کدامیک از موارد بالا را در درخواست خود میخواهد جستجو کند و پاسخ مناسب را برگردانی.
+جواب دقیق را نباید بدهی فقط و حتما مشخص میکنی که کاربر چه چیزی را میخواد. تولید جواب واقعی و تعداد واقعی از داده ها وظیفه تو نیست. فقط باید مشخص کنی که کاربر دنبال چه چیزی میگردد و چه چیزی را میخواهد.
+Valid values:
+- status: Done | In Progress | Review | Open
+- priority: High | Medium | Critical | Low
+- department: فنی | محصول | مالی | پشتیبانی | مدیریت | استقرار
+- time_window : 'هفته پیش' | 'ماه گذشته' | 'سه روز اخیر' و غیره. (اگر کاربر اشاره به بازه زمانی داشت باید این فیلد رو پر کنی و در غیر این صورت null باشه)
+
+ در ادامه چند نمونه از سوالاتی که ممکن است کاربر بپرسد را میبینیم:  
+few shot examples:
+User:
+چند تسک داریم؟
+
+Output:
+{
+  "status": "all",
+  "priority": null,
+  "fullname": null,
+  "department": null,
+  "time_window": null
+}
+
+User:
+چند تسک باز داریم؟
+
+Output:
+{
+  "status": "Open",
+  "priority": null,
+  "fullname": null,
+  "department": null,
+  "time_window": null
+}
+
+User:
+چند تسک بسته شده‌اند؟
+
+Output:
+{
+  "status": "Done",
+  "priority": null,
+  "fullname": null,
+  "department": null,
+  "time_window": null
+}
+
+User:
+طی یک ماه اخیر چند تسک بسته شده است؟
+
+Output:
+{
+  "status": "Done",
+  "priority": null,
+  "fullname": null,
+  "department": null,
+  "time_window": "طی یک ماه اخیر"
+}
+
+User:
+چند تسک با اولویت بالا داریم؟
+
+Output:
+{
+  "status": null,
+  "priority": "High",
+  "fullname": null,
+  "department": null,
+  "time_window": null
+}
+
+User:
+چند تسک بحرانی باز داریم؟
+
+Output:
+{
+  "status": "Open",
+  "priority": "Critical",
+  "fullname": null,
+  "department": null,
+  "time_window": null
+}
+
+User:
+در بخش پشتیبانی چند تسک باز داریم؟
+
+Output:
+{
+  "status": "Open",
+  "priority": null,
+  "fullname": null,
+  "department": "پشتیبانی",
+  "time_window": null
+}
+
+User:
+در این ماه چند تسک توسط علی صابری ثبت شده است؟
+
+Output:
+{
+  "status": null,
+  "priority": null,
+  "fullname": "علی صابری",
+  "department": null,
+  "time_window": "این ماه"
+}
+
+Here is the conversation history that you receive:
+{conversation_history}
+"""
+
+time_window_extractor_node_prompt = """تو یک مدل هستی که وظیفه داری بازه زمانی ذکر شده توسط کاربر را به تاریخ دقیق تبدیل کنی.
+کاربر ممکن است از عبارات مختلفی برای اشاره به بازه زمانی استفاده کند، مانند "هفته گذشته"، "ماه گذشته"، "سه روز اخیر" و غیره. وظیفه تو این است که این عبارات را به تاریخ دقیق شروع و پایان تبدیل کنی.
+برای مثال:
+{
+    "days" : int
+    "months" : int
+    "years" : int
+}
+User: هفته گذشته
+
+Date Extraction Rules:
+
+Recognize relative and fuzzy date expressions.
+
+Examples:
+
+امروز
+→ create_time_filter = "TODAY"
+
+دیروز
+→ create_time_filter = "YESTERDAY"
+
+این هفته
+→ create_time_filter = "THIS_WEEK"
+
+هفته گذشته
+→ create_time_filter = "LAST_WEEK"
+
+این ماه
+→ create_time_filter = "THIS_MONTH"
+
+ماه گذشته
+→ create_time_filter = "LAST_MONTH"
+
+امسال
+→ create_time_filter = "THIS_YEAR"
+
+سال گذشته
+→ create_time_filter = "LAST_YEAR"
+# start_date, end_date (if user mentions a specific time frame like last week or last month, you should use the time_tool to get the exact dates and include them in your response)
+# در ضمن کاربر اگر اشاره به زمان بندی خاصی کرد مثلا یک ماه پیش یا یک هفته اخیر باید ابزار tool زمان بندی رو صدا بزنی و تاریخ دقیق رو ازش بگیری و در پاسخ به سوالات آماری لحاظ کنی.
+# tool name: time_tool
+# tool input: a string representing the time frame mentioned by the user, for example "last week" or "last month"
+
+# tool output: a JSON object with the following format:
+# {
+#   "start_date": "YYYY-MM-DD",
+#   "end_date": "YYYY-MM-DD"
+# }
+When a relative date is detected:
+1. Store the original phrase in create_time.
+2. Store the normalized value in create_time_filter.
+"""
+
+
+# start_date, end_date (if user mentions a specific time frame like last week or last month, you should use the time_tool to get the exact dates and include them in your response)
+# در ضمن کاربر اگر اشاره به زمان بندی خاصی کرد مثلا یک ماه پیش یا یک هفته اخیر باید ابزار tool زمان بندی رو صدا بزنی و تاریخ دقیق رو ازش بگیری و در پاسخ به سوالات آماری لحاظ کنی.
+# tool name: time_tool
+# tool input: a string representing the time frame mentioned by the user, for example "last week" or "last month"
+
+# tool output: a JSON object with the following format:
+# {
+#   "start_date": "YYYY-MM-DD",
+#   "end_date": "YYYY-MM-DD"
+# }
