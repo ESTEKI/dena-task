@@ -5,7 +5,7 @@ from typing import Annotated, Literal, Union, Optional, Dict, Any
 from . import llm_definition as llms
 import agent_src.basemodels as basemodels
 import agent_src.prompts as Prompts
-
+import agent_src.utils as Utils
 # APPSTATE
 class AppState(TypedDict):
             user_msg: str
@@ -134,11 +134,12 @@ def to_exact_time(state: AppState):
             messages = [HumanMessage(content=formatted_prompt)]
         try:
             response = str_llm.invoke(messages)
+            exact_time = Utils.calculate_date_offset(response.dict(exclude_none=True))
             print(f"LLM response for time window extractor node:\n{response}")
         except Exception as e:
             print(f"Error in API call to LLM service for time window extractor node. msg: {e}")
             return {"time_window": None}
-        return {"time_window": response.dict(exclude_none=True)}
+        return {"time_window": exact_time}
 
 def chat(state: AppState):
         """

@@ -25,3 +25,7 @@
 2026-06-04 17:44:11,388 [Agent] [INFO] Graph compiled successfully.
 2026-06-04 17:44:21,431 [Agent] [INFO] Graph response: {'messages': [HumanMessage(content='چند تسک حیاتی تو دوماه گذشته داریم؟', additional_kwargs={}, response_metadata={}, id='d132f95c-ba59-4409-b924-e34dbe212c33')], 'user_intent': 'Statistics', 'search_criteria': {'time_window': 'دوماه گذشته', 'priority': 'Critical'}, 'time_window': {'days': 0, 'months': 0, 'years': 0}}
 2026-06-04 17:47:21,106 [Agent] [INFO] Graph compiled successfully.
+2026-06-04 17:47:28,733 [Agent] [INFO] Graph compiled successfully.
+2026-06-04 17:47:35,559 [Agent] [INFO] Graph response: {'messages': [HumanMessage(content='چند تسک حیاتی تو دوماه گذشته داریم؟', additional_kwargs={}, response_metadata={}, id='71aede88-01a1-481c-8f75-9b0293ec7d5b')], 'user_intent': 'Statistics', 'search_criteria': {'time_window': 'دوماه گذشته', 'priority': 'High'}, 'time_window': {'days': 0, 'months': 2, 'years': 0}}
+2026-06-04 18:04:07,310 [Agent] [INFO] Graph compiled successfully.
+2026-06-04 18:04:14,178 [Agent] [INFO] Graph response: {'messages': [HumanMessage(content='چند تسک حیاتی تو دوماه گذشته داریم؟', additional_kwargs={}, response_metadata={}, id='9bff2d6e-1e70-4217-b582-78f78cce4c30')], 'user_intent': 'Statistics', 'search_criteria': {'time_window': 'دوماه گذشته', 'priority': 'Critical'}, 'time_window': {'day': 4, 'month': 4, 'year': 2026}}

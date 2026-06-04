@@ -82,7 +82,7 @@ class StatisticsNodeOutput(BaseModel):
         description="If the user wants to search by department field in the database."
     )
 
-class TimeWindowOutput(BaseModel):
+class TimeWindowExactTimeOutput(BaseModel):
     """
     Represents the structured output for a LLM to extract exact time window from user conversation.
     It is used as the time window extractor node output to determine the exact time window the user wants to analyze in the ticketing system database.
