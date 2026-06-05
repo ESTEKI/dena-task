@@ -22,7 +22,7 @@ class Agent():
         graph_builder.add_node("orchestrator",Nodes.orchestrator)
         graph_builder.add_node("search_node",Nodes.search_node)
         graph_builder.add_node("statistics_node",Nodes.statistics_node)
-        graph_builder.add_node("time_window_extractor_node",Nodes.to_exact_time)
+        graph_builder.add_node("time_window_extractor_node",Nodes.time_window_extractor_node)
         graph_builder.add_node("chatbot",Nodes.chat)
         #graph_builder.add_node("tools", ٔTools.tool_node)
         graph_builder.add_edge(START, "orchestrator")

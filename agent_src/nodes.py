@@ -39,7 +39,7 @@ def orchestrator(state: AppState):
 
             formatted_prompt = Prompts.orchestrator_prompt.replace("{conversation_history}", str(last_msgs_history))
 
-            print(f"Formatted prompt for orchestrator:\n{formatted_prompt}")
+            #print(f"Formatted prompt for orchestrator:\n{formatted_prompt}")
             messages = [HumanMessage(content=formatted_prompt)]
         except Exception as e:
             print(f"Exception while building messages: {e}")
@@ -48,6 +48,7 @@ def orchestrator(state: AppState):
 
         try:
             response = str_llm.invoke(messages)
+            print(f"User intent in orchestrator Node:{response.intent}")
         except Exception as e:
             print(f"Error in API call to LLM service. msg: {e}")
             return {"user_intent": "None"}
@@ -71,7 +72,7 @@ def search_node(state: AppState):
 
             formatted_prompt = Prompts.search_node_prompt.replace("{conversation_history}", str(last_msgs_history))
 
-            print(f"Formatted prompt for search node:\n{formatted_prompt}")
+            #print(f"Formatted prompt for search node:\n{formatted_prompt}")
             messages = [HumanMessage(content=formatted_prompt)]
         except Exception as e:
             print(f"Exception while building messages for search node: {e}")
@@ -79,10 +80,12 @@ def search_node(state: AppState):
             messages = [HumanMessage(content=formatted_prompt)]
         try:
             response = str_llm.invoke(messages)
+            print(type(response))
+            print(response.dict(exclude_none=True))
         except Exception as e:
             print(f"Error in API call to LLM service for search node. msg: {e}")
             return {"search_criteria": {}}
-        return {"search_criteria": response.dict(exclude_none=True), "user_intent": "Search"}
+        return {"search_criteria": response.dict(exclude_none=False), "user_intent": "Search"}
 
 def statistics_node(state: AppState):
         llm = llms.llm_openai
@@ -101,7 +104,7 @@ def statistics_node(state: AppState):
 
             formatted_prompt = Prompts.statistics_node_prompt.replace("{conversation_history}", str(last_msgs_history))
 
-            print(f"Formatted prompt for statistics node:\n{formatted_prompt}")
+            #print(f"Formatted prompt for statistics node:\n{formatted_prompt}")
             messages = [HumanMessage(content=formatted_prompt)]
         except Exception as e:
             print(f"Exception while building messages for statistics node: {e}")
@@ -113,9 +116,9 @@ def statistics_node(state: AppState):
         except Exception as e:
             print(f"Error in API call to LLM service for statistics node. msg: {e}")
             return {"search_criteria": {}}
-        return {"search_criteria": response.dict(exclude_none=True), "user_intent": "Statistics"}
+        return {"search_criteria": response.dict(exclude_none=False), "user_intent": "Statistics"}
 
-def to_exact_time(state: AppState):
+def time_window_extractor_node(state: AppState):
         """ In this node, we first call the LLm to turn the literal description of time to integers
         Then, manually calculate the dates and output the exact time window."""
         llm = llms.llm_openai
@@ -126,8 +129,7 @@ def to_exact_time(state: AppState):
             time_window = search_criteria.get("time_window")
             print(f"Extracted time window from previous node:\n{time_window}")
             formatted_prompt = Prompts.time_window_extractor_node_prompt.replace("{conversation_history}", str(time_window))
-
-            print(f"Formatted prompt for time window extractor node:\n{formatted_prompt}")
+            #print(f"Formatted prompt for time window extractor node:\n{formatted_prompt}")
             messages = [HumanMessage(content=formatted_prompt)]
         except Exception as e:
             print(f"Exception while building messages for time window extractor node: {e}")
@@ -135,7 +137,7 @@ def to_exact_time(state: AppState):
             messages = [HumanMessage(content=formatted_prompt)]
         try:
             response = str_llm.invoke(messages)
-            exact_time = Utils.calculate_date_offset(response.dict(exclude_none=True))
+            exact_time = Utils.calculate_date_offset(response.dict(exclude_none=False))
             print(f"LLM response for time window extractor node:\n{response}")
         except Exception as e:
             print(f"Error in API call to LLM service for time window extractor node. msg: {e}")
@@ -146,7 +148,6 @@ def chat(state: AppState):
         """
         general chat node that takes in user input and returns a response from the llm.
         """
-        
 
         llm = llms.llm_openai
         #response = llms.llm_openai.invoke(messages)
@@ -189,7 +190,7 @@ def chat(state: AppState):
             elif user_intent == "Statistics":
                 user_intent = f"User is asking for statistics about the ticketing system data. And the total found number is {num_tasks}"
             formatted_prompt = formatted_prompt.replace("{user_intent}", user_intent)
-            print(f"Formatted prompt for statistics node:\n{formatted_prompt}")
+            #print(f"Formatted prompt for statistics node:\n{formatted_prompt}")
             messages = [HumanMessage(content=formatted_prompt)]
         except Exception as e:
             print(f"Exception while building messages for statistics node: {e}")
@@ -220,7 +221,8 @@ def chat(state: AppState):
         
         return {"messages": [content_text] , "search_results": search_results}
 
-# Conditional edge functions
+## ---------- Conditional edge functions -----------
+
 def should_continue(state: AppState):
     """
     Routes the flow based on user_intent produced by the orchestrator node.
