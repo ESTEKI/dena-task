@@ -124,31 +124,31 @@ def statistics_node(state: AppState):
             return {"search_criteria": {}}
         return {"search_criteria": response.dict(exclude_none=True), "user_intent": "Statistics"}
 
-def time_window_extractor_node(state: AppState):
-        """ In this node, we first call the LLm to turn the literal description of time to integers
-        Then, manually calculate the dates and output the exact time window."""
-        llm = llms.llm_openai
-        str_llm = llm.with_structured_output(basemodels.TimeWindowLLMIntOutput)
-        try:  
-            search_criteria = state.get("search_criteria", {})
-            print(f"Search criteria received in time window extractor node:\n{search_criteria}")
-            time_window = search_criteria.get("time_window")
-            print(f"Extracted time window from previous node:\n{time_window}")
-            formatted_prompt = Prompts.time_window_extractor_node_prompt.replace("{conversation_history}", str(time_window))
-            #print(f"Formatted prompt for time window extractor node:\n{formatted_prompt}")
-            messages = [HumanMessage(content=formatted_prompt)]
-        except Exception as e:
-            print(f"Exception while building messages for time window extractor node: {e}")
-            formatted_prompt = Prompts.time_window_extractor_node_prompt.replace("{conversation_history}", "failed to load history!")
-            messages = [HumanMessage(content=formatted_prompt)]
-        try:
-            response = str_llm.invoke(messages)
-            exact_time = Utils.calculate_date_offset(response.dict(exclude_none=False))
-            print(f"LLM response for time window extractor node:\n{response}")
-        except Exception as e:
-            print(f"Error in API call to LLM service for time window extractor node. msg: {e}")
-            return {"time_window": None}
-        return {"time_window": exact_time}
+# def time_window_extractor_node(state: AppState):
+#         """ In this node, we first call the LLm to turn the literal description of time to integers
+#         Then, manually calculate the dates and output the exact time window."""
+#         llm = llms.llm_openai
+#         str_llm = llm.with_structured_output(basemodels.TimeWindowLLMIntOutput)
+#         try:  
+#             search_criteria = state.get("search_criteria", {})
+#             print(f"Search criteria received in time window extractor node:\n{search_criteria}")
+#             time_window = search_criteria.get("time_window")
+#             print(f"Extracted time window from previous node:\n{time_window}")
+#             formatted_prompt = Prompts.time_window_extractor_node_prompt.replace("{conversation_history}", str(time_window))
+#             #print(f"Formatted prompt for time window extractor node:\n{formatted_prompt}")
+#             messages = [HumanMessage(content=formatted_prompt)]
+#         except Exception as e:
+#             print(f"Exception while building messages for time window extractor node: {e}")
+#             formatted_prompt = Prompts.time_window_extractor_node_prompt.replace("{conversation_history}", "failed to load history!")
+#             messages = [HumanMessage(content=formatted_prompt)]
+#         try:
+#             response = str_llm.invoke(messages)
+#             exact_time = Utils.calculate_date_offset(response.dict(exclude_none=False))
+#             print(f"LLM response for time window extractor node:\n{response}")
+#         except Exception as e:
+#             print(f"Error in API call to LLM service for time window extractor node. msg: {e}")
+#             return {"time_window": None}
+#         return {"time_window": exact_time}
 
 def retrieve_data(state: AppState):
         """
@@ -204,6 +204,7 @@ def chat(state: AppState):
                 user_intent = f"User is asking for statistics about the ticketing system data. And the total found number is {num_tasks}"
             elif user_intent == "Search":
                 user_intent = f"User is asking for Search about the ticketing system data. And the total found number is {num_tasks}"
+                
             print(f"{user_intent}")
             formatted_prompt = Prompts.chat_node_prompt.replace("{user_intent}", str(user_intent))
             print(formatted_prompt)
@@ -265,19 +266,24 @@ def should_continue(state: AppState):
     return intent_map.get(user_intent, "None")
         
         
-def is_time_window_extraction_needed(state: AppState):
-    """
-    Checks if the user input requires time window extraction based on the presence of a time window in the search criteria.
-    If the user intent is "Statistics" and there is a time window mentioned in the search criteria, it returns True, otherwise False.
-    """
-    user_intent = state.get("user_intent")
-    search_criteria = state.get("search_criteria", {})
+# def is_time_window_extraction_needed(state: AppState):
+#     """
+#     Checks if the user input requires time window extraction based on the presence of a time window in the search criteria.
+#     If the user intent is "Statistics" and there is a time window mentioned in the search criteria, it returns True, otherwise False.
+#     """
+#     user_intent = state.get("user_intent")
+#     search_criteria = state.get("search_criteria", {})
     
-    if user_intent == "Statistics" and search_criteria.get("time_window"):
-        print("---------Time window extraction needed based on user intent and search criteria.")
-        return "time_window_extractor_node"
-    return "end"
+#     if user_intent == "Statistics" and search_criteria.get("time_window"):
+#         print("---------Time window extraction needed based on user intent and search criteria.")
+#         return "time_window_extractor_node"
+#     return "end"
 
+def is_tools(state: AppState) -> str:
+        last_message = state["messages"][-1]
+        if getattr(last_message, "tool_calls", None):
+            return "tools"
+        return "done"   
 # -------- tool node -------------
 
-time_extractor_tool_node = ToolNode([myTools.time_window_extractor_tool])
+tools_node = ToolNode([myTools.time_window_extractor_tool])

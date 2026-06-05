@@ -58,7 +58,7 @@ id	title	description	create_time	status	assignee_id	priority	due_time	fullname	d
 وظیفه تو این است که مشخص کنی کاربر کدامیک از موارد بالا را در درخواست خود میخواهد جستجو کند و پاسخ مناسب را برگردانی.
 Valid values:
 - status: Done | In Progress | Review | Open
-- priority: High | Medium | Critical | Low
+- priority: High (زیاد یا بالا) | Medium (متوسط) | Critical (بحرانی بغرنج) | Low (کم)
 - department: فنی | محصول | مالی | پشتیبانی | مدیریت | استقرار
 
  در ادامه چند نمونه از سوالاتی که ممکن است کاربر بپرسد را میبینیم:
@@ -116,13 +116,23 @@ id	title	description	create_time	status	assignee_id	priority	due_time	fullname	d
 وظیفه شما این است که به سوالات آماری کاربران پاسخ دهید. سوالات آماری شامل سوالاتی هستند که با چه تعداد یا چند یا چنتا پرسیده میشوند.
 وظیفه تو این است که مشخص کنی کاربر کدامیک از موارد بالا را در درخواست خود میخواهد جستجو کند و پاسخ مناسب را برگردانی.
 جواب دقیق را نباید بدهی فقط و حتما مشخص میکنی که کاربر چه چیزی را میخواد. تولید جواب واقعی و تعداد واقعی از داده ها وظیفه تو نیست. فقط باید مشخص کنی که کاربر دنبال چه چیزی میگردد و چه چیزی را میخواهد.
-Valid values:
-- status: Done | In Progress | Review | Open
-- priority: High | Medium | Critical | Low
-- department: فنی | محصول | مالی | پشتیبانی | مدیریت | استقرار
-- time_window : 'هفته پیش' | 'ماه گذشته' | 'سه روز اخیر' و غیره. (اگر کاربر اشاره به بازه زمانی داشت باید این فیلد رو پر کنی و در غیر این صورت null باشه)
 
- در ادامه چند نمونه از سوالاتی که ممکن است کاربر بپرسد را میبینیم:  
+Valid values:
+- status: Done | In Progress | Review | Open 
+- priority: High (زیاد یا بالا) | Medium (متوسط) | Critical (بحرانی بغرنج) | Low (کم)
+- department: فنی | محصول | مالی | پشتیبانی | مدیریت | استقرار
+- time_window : {"days" : 0, "months" : 0, "years" : 0}  
+
+در صورتی که کاربر در پیام اشاره به بازه زمانی بکند باید یک ابزار را فراخوانی کنی که وظیفه آن تبدیل زمان توصیفی به تاریخ دقیق است. 
+به طور مثال ممکن است از عباراتی مانند  'هفته پیش'  'ماه گذشته'  'سه روز اخیر' و غیره استفاده کند 
+در این صورت باید ابزار (tool) زیر را فراخوانی کنی:
+
+time_extractor_tool_node
+
+این ابزار (time_extractor_tool_node) تاریخی که باید در خروجی خود ثبت کنی را به تو میدهد.
+
+
+در ادامه چند نمونه از سوالاتی که ممکن است کاربر بپرسد را میبینیم:  
 few shot examples:
 User:
 چند تسک داریم؟
@@ -162,14 +172,14 @@ Output:
 
 User:
 طی یک ماه اخیر چند تسک بسته شده است؟
-
+Call the tool -> time_extractor_tool_node -> tool output e.g. = {"days" : 2, "months" : 1, "years" : 2026} 
 Output:
 {
   "status": "Done",
   "priority": null,
   "fullname": null,
   "department": null,
-  "time_window": "طی یک ماه اخیر"
+  "time_window": {"days" : 2, "months" : 1, "years" : 2026}
 }
 
 User:
@@ -210,14 +220,14 @@ Output:
 
 User:
 در این ماه چند تسک توسط علی صابری ثبت شده است؟
-
+Call the tool -> time_extractor_tool_node -> tool output e.g. = {"days" : 3, "months" : 1, "years" : 2026} 
 Output:
 {
   "status": null,
   "priority": null,
   "fullname": "علی صابری",
   "department": null,
-  "time_window": "این ماه"
+  "time_window": {"days" : 3, "months" : 1, "years" : 2026}
 }
 
 Here is the conversation history that you receive:

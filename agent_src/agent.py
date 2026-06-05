@@ -22,13 +22,16 @@ class Agent():
         graph_builder.add_node("orchestrator",Nodes.orchestrator)
         graph_builder.add_node("search_node",Nodes.search_node)
         graph_builder.add_node("statistics_node",Nodes.statistics_node)
-        graph_builder.add_node("time_window_extractor_node",Nodes.time_window_extractor_node)
+        #graph_builder.add_node("time_window_extractor_node",Nodes.time_window_extractor_node)
         graph_builder.add_node("retrieve_data",Nodes.retrieve_data)
         graph_builder.add_node("chatbot",Nodes.chat)
-        #graph_builder.add_node("tools", ٔTools.tool_node)
+
+        graph_builder.add_node("tools", Nodes.tools_node)
 
         
         graph_builder.add_edge(START, "orchestrator")
+
+        # leads the flow to its dedicated node after orchestrator node
         graph_builder.add_conditional_edges(
             "orchestrator",
             Nodes.should_continue,
@@ -41,15 +44,23 @@ class Agent():
             }
         )
 
+        # graph_builder.add_conditional_edges(
+        #     "statistics_node",
+        #     Nodes.is_time_window_extraction_needed,
+        #     {
+        #         "time_window_extractor_node": "time_window_extractor_node",
+        #         "end": "retrieve_data"
+        #     }
+        # )
+
+        # checks the last ai message for tool calling
         graph_builder.add_conditional_edges(
             "statistics_node",
-            Nodes.is_time_window_extraction_needed,
-            {
-                "time_window_extractor_node": "time_window_extractor_node",
-                "end": "retrieve_data"
-            }
+            Nodes.is_tools,
+            {"tools": "tools", "done": "retrieve_data"}
         )
-        graph_builder.add_edge("time_window_extractor_node", "retrieve_data")
+
+        #graph_builder.add_edge("time_window_extractor_node", "retrieve_data")
         graph_builder.add_edge("search_node", "retrieve_data")
         graph_builder.add_edge("retrieve_data", "chatbot")
         #graph_builder.add_edge("search_node", "chatbot")
