@@ -80,7 +80,7 @@ Return ONLY a valid JSON object in the following format:
 ### Examples:
 
 User: تیکت های مربوط به علی صابری را نشان بده
-Output:
+Assistant:
 {
   "fullname": "علی صابری",
   "create_time": null,
@@ -91,7 +91,7 @@ Output:
 }
 
 User: تیکت های بخش پشتیبانی با اولویت بالا
-Output:
+Assistant:
 {
   "department": "پشتیبانی",
   "priority": "High",
@@ -106,15 +106,15 @@ Here is the conversation history that you receive:
 """
 
 
-statistics_node_prompt = """تو یک مدل هستی که وظیفه داری سوالات آماری کاربران را پاسخ بدی.
+statistics_node_prompt = """تو یک قسمتی از مدلی هستی که وظیفه داری سوالات آماری کاربران را پاسخ بدی.
 کاربر در مورد داده های موجود در یک دیتابیس مربوط به سامانه تیکتینگ ticketing است. 
 دو نمونه از سطر موجود در این دیتاست عبارتند از:
 id	title	description	create_time	status	assignee_id	priority	due_time	fullname	department
 0	1	رفع باگ ورود کاربران	بررسی و رفع خطای لاگین در نسخه وب	2026/01/05	Done	1	High	2026/01/08	علی صابری	فنی
 1	2	پیاده سازی API احراز هویت	ایجاد سرویس JWT برای کاربران	2026/01/07	Done	2	Critical	2026/01/15	رضا محمدی	فنی
 
-وظیفه شما این است که به سوالات آماری کاربران پاسخ دهید. سوالات آماری شامل سوالاتی هستند که با چه تعداد یا چند یا چنتا پرسیده میشوند.
-وظیفه تو این است که مشخص کنی کاربر کدامیک از موارد بالا را در درخواست خود میخواهد جستجو کند و پاسخ مناسب را برگردانی.
+وظیفه شما فقط استخراج فیلترها از سوال کاربر است. سوالات آماری شامل سوالاتی هستند که با چه تعداد یا چند یا چنتا پرسیده میشوند.
+وظیفه تو این است که مشخص کنی کاربر کدامیک از موارد بالا را در طول کل مکالمه میخواهد جستجو کند و پاسخ مناسب را برگردانی.
 جواب دقیق را نباید بدهی فقط و حتما مشخص میکنی که کاربر چه چیزی را میخواد. تولید جواب واقعی و تعداد واقعی از داده ها وظیفه تو نیست. فقط باید مشخص کنی که کاربر دنبال چه چیزی میگردد و چه چیزی را میخواهد.
 Valid values:
 - status: Done | In Progress | Review | Open
@@ -124,10 +124,11 @@ Valid values:
 
  در ادامه چند نمونه از سوالاتی که ممکن است کاربر بپرسد را میبینیم:  
 few shot examples:
+
 User:
 چند تسک داریم؟
 
-Output:
+Assistant:
 {
   "status": "all",
   "priority": null,
@@ -139,7 +140,7 @@ Output:
 User:
 چند تسک باز داریم؟
 
-Output:
+Assistant:
 {
   "status": "Open",
   "priority": null,
@@ -151,7 +152,7 @@ Output:
 User:
 چند تسک بسته شده‌اند؟
 
-Output:
+Assistant:
 {
   "status": "Done",
   "priority": null,
@@ -163,7 +164,7 @@ Output:
 User:
 طی یک ماه اخیر چند تسک بسته شده است؟
 
-Output:
+Assistant:
 {
   "status": "Done",
   "priority": null,
@@ -172,22 +173,11 @@ Output:
   "time_window": "طی یک ماه اخیر"
 }
 
-User:
-چند تسک با اولویت بالا داریم؟
-
-Output:
-{
-  "status": null,
-  "priority": "High",
-  "fullname": null,
-  "department": null,
-  "time_window": null
-}
 
 User:
 چند تسک بحرانی باز داریم؟
 
-Output:
+Assistant:
 {
   "status": "Open",
   "priority": "Critical",
@@ -199,7 +189,7 @@ Output:
 User:
 در بخش پشتیبانی چند تسک باز داریم؟
 
-Output:
+Assistant:
 {
   "status": "Open",
   "priority": null,
@@ -209,9 +199,12 @@ Output:
 }
 
 User:
-در این ماه چند تسک توسط علی صابری ثبت شده است؟
-
-Output:
+در این ماه چند تسک توسط  ثبت شده است؟
+Assistant:
+در این ماه ۹۰ تسک ثبت شده.
+User:
+چنتاش مال علی صابری است؟
+Assistant:
 {
   "status": null,
   "priority": null,
@@ -220,7 +213,12 @@ Output:
   "time_window": "این ماه"
 }
 
-Here is the conversation history that you receive:
+
+دقت کن که باید به کل مکالمه توجه کنی ممکنه یک سوال در ادامه سوال قبلی باشه.
+If the user refers to previous question using words like "چنتاش", "اونها", "همون", "قبلی",
+you MUST reuse the previous time_window/status/filters unless explicitly changed.
+Here is the conversation history that you receive, look into the whole conversation history, not just the last user input:
+
 {conversation_history}
 """
 
@@ -303,6 +301,7 @@ Examples:
 here is the part of the conversation history that you receive:
 {conversation_history}
 """
+
 chat_node_prompt = """تو یک مدل هستی که وظیفه داری به سوالات و درخواست های کاربران پاسخ بدی.
 کاربر در مورد داده های موجود در یک دیتابیس مربوط به سامانه تیکتینگ ticketing است.
 کاربر ممکن است یکی از وظایف زیر را برای ما مشخث کرده باشد:

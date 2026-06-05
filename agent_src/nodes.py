@@ -96,16 +96,16 @@ def statistics_node(state: AppState):
             last_msgs_history = []
             for message in reversed(messages):
                 if isinstance(message, HumanMessage):
-                    last_msgs_history.append(f"User: {message.content}")
+                    last_msgs_history.append(f"User: {message.content}\n")
                 elif isinstance(message, AIMessage):
-                    last_msgs_history.append(f"Assistant: {message.content}")
+                    last_msgs_history.append(f"Assistant: {message.content}\n")
                 if len(last_msgs_history) == MAX_CONVERSATION_TURNS * 2:
                     break
             last_msgs_history.reverse()
+            formatted_history = "\n".join(last_msgs_history)
+            formatted_prompt = Prompts.statistics_node_prompt.replace("{conversation_history}", formatted_history)
 
-            formatted_prompt = Prompts.statistics_node_prompt.replace("{conversation_history}", str(last_msgs_history))
-
-            # print(f"Formatted prompt for statistics node:\n{formatted_prompt}")
+            print(f"Formatted prompt for statistics node:\n{formatted_prompt}")
             messages = [HumanMessage(content=formatted_prompt)]
         except Exception as e:
             print(f"Exception while building messages for statistics node: {e}")
@@ -203,9 +203,10 @@ def chat(state: AppState):
             if not user_intent or user_intent == "None":
                 user_intent = "Did not understand user intent"
             elif user_intent == "Statistics":
-                user_intent = f"User is asking for statistics about the ticketing system data. And the total found number is {num_tasks}"
+                user_intent = f"‌بر اساس مکالمه با کاربر the total found number is {num_tasks}"
             elif user_intent == "Search":
-                user_intent = f"User is asking for Search about the ticketing system data. And the total found number is {num_tasks}"
+                user_intent = f"‌بر اساس مکالمه با کاربر  the total found number is {num_tasks}"
+                
             print(f"{user_intent}")
             formatted_prompt = Prompts.chat_node_prompt.replace("{user_intent}", str(user_intent))
             print(formatted_prompt)
