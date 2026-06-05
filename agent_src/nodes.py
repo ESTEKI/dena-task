@@ -37,8 +37,9 @@ def orchestrator(state: AppState):
                 if len(last_msgs_history) == MAX_CONVERSATION_TURNS * 2:
                     break
             last_msgs_history.reverse()
-
-            formatted_prompt = Prompts.orchestrator_prompt.replace("{conversation_history}", str(last_msgs_history))
+            last_msgs_history.reverse()
+            formatted_history = "\n".join(last_msgs_history)
+            formatted_prompt = Prompts.orchestrator_prompt.replace("{conversation_history}", formatted_history)
 
             #print(f"Formatted prompt for orchestrator:\n{formatted_prompt}")
             messages = [HumanMessage(content=formatted_prompt)]
@@ -70,10 +71,10 @@ def search_node(state: AppState):
                 if len(last_msgs_history) == MAX_CONVERSATION_TURNS * 2:
                     break
             last_msgs_history.reverse()
+            formatted_history = "\n".join(last_msgs_history)
+            formatted_prompt = Prompts.search_node_prompt.replace("{conversation_history}", formatted_history)
 
-            formatted_prompt = Prompts.search_node_prompt.replace("{conversation_history}", str(last_msgs_history))
-
-            #print(f"Formatted prompt for search node:\n{formatted_prompt}")
+            print(f"Formatted prompt for search node:\n{formatted_prompt}")
             messages = [HumanMessage(content=formatted_prompt)]
         except Exception as e:
             print(f"Exception while building messages for search node: {e}")
@@ -81,8 +82,8 @@ def search_node(state: AppState):
             messages = [HumanMessage(content=formatted_prompt)]
         try:
             response = str_llm.invoke(messages)
-            print(type(response))
-            print(response.dict(exclude_none=True))
+            print(f"LLM response for search node:\n{response}")
+
         except Exception as e:
             print(f"Error in API call to LLM service for search node. msg: {e}")
             return {"search_criteria": {}}
@@ -276,7 +277,7 @@ def is_time_window_extraction_needed(state: AppState):
     user_intent = state.get("user_intent")
     search_criteria = state.get("search_criteria", {})
     
-    if user_intent == "Statistics" and search_criteria.get("time_window"):
+    if search_criteria.get("time_window"):
         print("---------Time window extraction needed based on user intent and search criteria.")
         return "time_window_extractor_node"
     return "end"

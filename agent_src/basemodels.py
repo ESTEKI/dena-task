@@ -22,12 +22,12 @@ class SearchNodeOutput(BaseModel):
     Represents the structured output for a LLM to extract search parameters from user conversation.
     It is used in the search node to determine what information the user wants to search for in the ticketing system database.
     """
-    create_time: Optional[str] = Field(
+    time_window: Optional[str] = Field(
         None,
-        description="If the user wants to search by create_time field in the database."
+        description="If the user wants to search by time_window field in the database."
     )
 
-    status: Optional[Literal["Done", "In Progress", "Review", "Open"]] = Field(
+    status: Optional[Literal["Done", "In Progress", "Review", "Open", "all"]] = Field(
         None,
         description="If the user wants to search by status field in the database."
     )
@@ -35,11 +35,6 @@ class SearchNodeOutput(BaseModel):
     priority: Optional[Literal["High", "Medium", "Critical", "Low"]] = Field(
         None,
         description="If the user wants to search by priority field in the database."
-    )
-
-    due_time: Optional[str] = Field(
-        None,
-        description="If the user wants to search by due_time field in the database."
     )
 
     fullname: Optional[str] = Field(

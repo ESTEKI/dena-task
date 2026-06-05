@@ -45,7 +45,11 @@ id	title	description	create_time	status	assignee_id	priority	due_time	fullname	d
 در صورتی که ابهامی در مکالمه یا خواسته کاربر بود حتما گزینه None  را باید برگردانی. 
 در صورتی که متوجه نشدی که کاربر چه موضوعی را میپرسد یا نا مرتبط بود هم گزینه None باید انتخاب شود.
 
-here is the conversation history that you receive:
+دقت کن که باید به کل مکالمه توجه کنی ممکنه یک سوال در ادامه سوال قبلی باشه.
+If the user refers to previous question using words like "چنتاش", "اونها", "همون", "قبلی",
+you MUST reuse the previous time_window/status/filters unless explicitly changed.
+Here is the conversation history that you receive, look into the whole conversation history, not just the last user input:
+
 {conversation_history}
 You should only output the category name without any explanation. The category names are: Statistics, Analytical, Search, Operation.
 
@@ -60,6 +64,7 @@ Valid values:
 - status: Done | In Progress | Review | Open
 - priority: High | Medium | Critical | Low
 - department: فنی | محصول | مالی | پشتیبانی | مدیریت | استقرار
+- time_window : 'هفته پیش' | 'ماه گذشته' | 'سه روز اخیر' و غیره. (اگر کاربر اشاره به بازه زمانی داشت باید این فیلد رو پر کنی و در غیر این صورت null باشه)
 
  در ادامه چند نمونه از سوالاتی که ممکن است کاربر بپرسد را میبینیم:
 - تیکت های مربوط به علی صابری را نشان بده
@@ -69,12 +74,11 @@ If a field is not mentioned, return null for it.
 Return ONLY a valid JSON object in the following format:
 
 {
-  "create_time": null,
   "status": null,
   "priority": null,
-  "due_time": null,
   "fullname": null,
   "department": null
+  "time_window": null
 }
 
 ### Examples:
@@ -83,25 +87,27 @@ User: تیکت های مربوط به علی صابری را نشان بده
 Assistant:
 {
   "fullname": "علی صابری",
-  "create_time": null,
   "status": null,
   "priority": null,
-  "due_time": null,
   "department": null
+  "time_window": null
 }
 
-User: تیکت های بخش پشتیبانی با اولویت بالا
+User: تو ۳ ماه اخیر تیکت های بخش پشتیبانی با اولویت بالا
 Assistant:
 {
   "department": "پشتیبانی",
   "priority": "High",
-  "create_time": null,
   "status": null,
-  "due_time": null,
   "fullname": null
+  "time_window": "۳ ماه اخیر"
 }
 
-Here is the conversation history that you receive:
+دقت کن که باید به کل مکالمه توجه کنی ممکنه یک سوال در ادامه سوال قبلی باشه.
+If the user refers to previous question using words like "چنتاش", "اونها", "همون", "قبلی",
+you MUST reuse the previous time_window/status/filters unless explicitly changed.
+Here is the conversation history that you receive, look into the whole conversation history, not just the last user input:
+
 {conversation_history}
 """
 

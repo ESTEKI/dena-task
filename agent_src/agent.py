@@ -49,8 +49,16 @@ class Agent():
                 "end": "retrieve_data"
             }
         )
+        graph_builder.add_conditional_edges(
+            "search_node",
+            Nodes.is_time_window_extraction_needed,
+            {
+                "time_window_extractor_node": "time_window_extractor_node",
+                "end": "retrieve_data"
+            }
+        )
         graph_builder.add_edge("time_window_extractor_node", "retrieve_data")
-        graph_builder.add_edge("search_node", "retrieve_data")
+        #graph_builder.add_edge("search_node", "retrieve_data")
         graph_builder.add_edge("retrieve_data", "chatbot")
         #graph_builder.add_edge("search_node", "chatbot")
 

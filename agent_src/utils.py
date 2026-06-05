@@ -18,6 +18,13 @@ def calculate_date_offset(time_window: dict) -> dict:
         days=time_window.get("days", 0),
     )
 
+    if result.year < 2026:
+        return {
+        "day": 1,
+        "month": 1,
+        "year": 2026,
+        }
+
     return {
         "day": result.day,
         "month": result.month,
