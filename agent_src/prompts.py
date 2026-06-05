@@ -303,6 +303,88 @@ Examples:
 here is the part of the conversation history that you receive:
 {conversation_history}
 """
+
+time_window_extractor_tool_prompt = """تو یک مدل هستی که وظیفه داری بازه زمانی ذکر شده توسط کاربر را به تاریخ دقیق تبدیل کنی.
+کاربر ممکن است از عبارات مختلفی برای اشاره به بازه زمانی استفاده کند، مانند "هفته گذشته"، "ماه گذشته"، "سه روز اخیر" و غیره. وظیفه تو این است که این عبارات را به تاریخ دقیق شروع و پایان تبدیل کنی.
+خروجی تو باید یک شیء JSON با فرمت زیر باشد:
+{
+    "days" : int,
+    "months" : int,
+    "years" : int
+}
+
+Date Extraction Rules:
+
+Recognize relative and fuzzy date expressions.
+
+Examples:
+
+امروز
+{
+    "days" : 0,
+    "months" : 0,
+    "years" : 0
+}
+دیروز
+{
+    "days" : 1,
+    "months" : 0,
+    "years" : 0
+}
+
+این هفته
+{
+    "days" : 7,
+    "months" : 0,
+    "years" : 0
+}
+هفته گذشته
+{
+    "days" : 7,
+    "months" : 0,
+    "years" : 0
+}
+
+این ماه
+{
+    "days" : 0,
+    "months" : 1,
+    "years" : 0
+}
+
+ماه گذشته
+{
+    "days" : 0,
+    "months" : 1,
+    "years" : 0
+}
+
+امسال
+{
+    "days" : 0,
+    "months" : 0,
+    "years" : 1
+}
+
+دو هفته اخیر
+{
+    "days" : 14,
+    "months" : 0,
+    "years" : 0
+}
+
+سه ماه 
+{
+    "days" : 0,
+    "months" : 3,
+    "years" : 0
+}
+
+here is the part of the conversation history that you receive:
+{time_expression}
+"""
+
+
 chat_node_prompt = """تو یک مدل هستی که وظیفه داری به سوالات و درخواست های کاربران پاسخ بدی.
 کاربر در مورد داده های موجود در یک دیتابیس مربوط به سامانه تیکتینگ ticketing است.
 کاربر ممکن است یکی از وظایف زیر را برای ما مشخث کرده باشد:

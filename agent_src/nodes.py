@@ -1,11 +1,16 @@
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from langgraph.graph.message import add_messages
+from langgraph.prebuilt import ToolNode
+
 from typing_extensions import TypedDict
 from typing import Annotated, Literal, Union, Optional, Dict, Any
-from . import llm_definition as llms
+
+import agent_src.llm_definition as llms
 import agent_src.basemodels as basemodels
 import agent_src.prompts as Prompts
 import agent_src.utils as Utils
+import agent_src.tools as myTools
+
 # APPSTATE
 class AppState(TypedDict):
             user_msg: str
@@ -273,3 +278,6 @@ def is_time_window_extraction_needed(state: AppState):
         return "time_window_extractor_node"
     return "end"
 
+# -------- tool node -------------
+
+time_extractor_tool_node = ToolNode([myTools.time_window_extractor_tool])
