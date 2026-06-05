@@ -26,13 +26,29 @@ def calculate_date_offset(time_window: dict) -> dict:
 
 def call_database_api(search_criteria, time_window):
     url = "http://127.0.0.1:8008/search"
-
+    
     payload = {
         "search_criteria": search_criteria,
         "time_window": time_window
     }
+    print("-----api call----------------")
+    print("PAYLOAD:")
+    print(payload)
+    print(type(time_window))
+#     payload = {
+#     "status": search_criteria.get("status"),
+#     "priority": search_criteria.get("priority"),
+#     "fullname": search_criteria.get("fullname"),
+#     "department": search_criteria.get("department"),
+#     "assignee_id": search_criteria.get("assignee_id"),
+#     "time_window": time_window
+# }
 
     response = requests.post(url, json=payload, timeout=10)
+    print(response.status_code)
+    print(response.text)
     response.raise_for_status()
+    print("-----api call----------------")
+
     
     return response.json()

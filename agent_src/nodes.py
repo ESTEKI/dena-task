@@ -13,8 +13,9 @@ class AppState(TypedDict):
             user_intent: Optional[Literal["Statistics", "Analytical", "Search", "Operation","None"]]
             search_criteria: Optional[Dict[str, Any]]
             time_window: Optional[str]
-            search_results: Optional[Dict[str, Any]]
+            retrieved_data: Optional[Dict[str, Any]]
 
+MAX_CONVERSATION_TURNS = 3
 
 def orchestrator(state: AppState):
         """
@@ -25,7 +26,7 @@ def orchestrator(state: AppState):
         str_llm = llm.with_structured_output(basemodels.OrchestratorClassification)
         messages = state.get("messages", [])
 
-        # Only keep the last 4 messages for context to avoid hitting token limits, and format them for the prompt
+        # Only keep the last 6 messages for context to avoid hitting token limits, and format them for the prompt
         try:
             last_msgs_history = []
             for message in reversed(messages):
@@ -33,7 +34,7 @@ def orchestrator(state: AppState):
                     last_msgs_history.append(f"User: {message.content}")
                 elif isinstance(message, AIMessage):
                     last_msgs_history.append(f"Assistant: {message.content}")
-                if len(last_msgs_history) == 2:
+                if len(last_msgs_history) == MAX_CONVERSATION_TURNS * 2:
                     break
             last_msgs_history.reverse()
 
@@ -66,7 +67,7 @@ def search_node(state: AppState):
                     last_msgs_history.append(f"User: {message.content}")
                 elif isinstance(message, AIMessage):
                     last_msgs_history.append(f"Assistant: {message.content}")
-                if len(last_msgs_history) == 2:
+                if len(last_msgs_history) == MAX_CONVERSATION_TURNS * 2:
                     break
             last_msgs_history.reverse()
 
@@ -85,7 +86,7 @@ def search_node(state: AppState):
         except Exception as e:
             print(f"Error in API call to LLM service for search node. msg: {e}")
             return {"search_criteria": {}}
-        return {"search_criteria": response.dict(exclude_none=False), "user_intent": "Search"}
+        return {"search_criteria": response.dict(exclude_none=True), "user_intent": "Search"}
 
 def statistics_node(state: AppState):
         llm = llms.llm_openai
@@ -98,13 +99,13 @@ def statistics_node(state: AppState):
                     last_msgs_history.append(f"User: {message.content}")
                 elif isinstance(message, AIMessage):
                     last_msgs_history.append(f"Assistant: {message.content}")
-                if len(last_msgs_history) == 2:
+                if len(last_msgs_history) == MAX_CONVERSATION_TURNS * 2:
                     break
             last_msgs_history.reverse()
 
             formatted_prompt = Prompts.statistics_node_prompt.replace("{conversation_history}", str(last_msgs_history))
 
-            #print(f"Formatted prompt for statistics node:\n{formatted_prompt}")
+            # print(f"Formatted prompt for statistics node:\n{formatted_prompt}")
             messages = [HumanMessage(content=formatted_prompt)]
         except Exception as e:
             print(f"Exception while building messages for statistics node: {e}")
@@ -116,7 +117,7 @@ def statistics_node(state: AppState):
         except Exception as e:
             print(f"Error in API call to LLM service for statistics node. msg: {e}")
             return {"search_criteria": {}}
-        return {"search_criteria": response.dict(exclude_none=False), "user_intent": "Statistics"}
+        return {"search_criteria": response.dict(exclude_none=True), "user_intent": "Statistics"}
 
 def time_window_extractor_node(state: AppState):
         """ In this node, we first call the LLm to turn the literal description of time to integers
@@ -144,6 +145,25 @@ def time_window_extractor_node(state: AppState):
             return {"time_window": None}
         return {"time_window": exact_time}
 
+def retrieve_data(state: AppState):
+        """
+        This node calls dataset API and saves them in agent State.
+        """
+        #user_intent = state.get("user_intent", "None")
+        search_criteria = state.get("search_criteria",[])
+        time_window = state.get("time_window") or None
+
+        try:
+            if search_criteria or time_window:
+                retrieved_data = Utils.call_database_api(search_criteria, time_window)
+                print("API result:", retrieved_data)
+        except Exception as e:
+            print(f"Error calling API: {e}")
+            retrieved_data = {"count": 0, "data": []}
+        
+        return {"retrieved_data": retrieved_data}
+
+
 def chat(state: AppState):
         """
         general chat node that takes in user input and returns a response from the llm.
@@ -151,51 +171,48 @@ def chat(state: AppState):
 
         llm = llms.llm_openai
         #response = llms.llm_openai.invoke(messages)
-
         messages = state.get("messages", []) 
-        user_intent = state.get("user_intent", "None")
-        search_criteria = state.get("search_criteria",[])
-        time_window = state.get("time_window",[])
-        api_result = None
-
-        # this part should be called with tool calling for better manipulation of returned results.
-        search_results = None
-        try:
-            if search_criteria or time_window:
-                search_results = Utils.call_database_api(search_criteria, time_window)
-                print("API result:", search_results)
-        except Exception as e:
-            print(f"Error calling API: {e}")
-            search_results = {"count": 0, "data": []}
-
+        user_intent = state.get("user_intent",[])
+        
         try:            
-            last_msgs_history = []
-            for message in reversed(messages):
-                if isinstance(message, HumanMessage):
-                    last_msgs_history.append(f"User: {message.content}")
-                elif isinstance(message, AIMessage):
-                    last_msgs_history.append(f"Assistant: {message.content}")
-                if len(last_msgs_history) == 2:
-                    break
-            last_msgs_history.reverse()
+            # last_msgs_history = []
+            # for message in reversed(messages):
+            #     if isinstance(message, HumanMessage):
+            #         last_msgs_history.append(f"User: {message.content}")
+            #     elif isinstance(message, AIMessage):
+            #         last_msgs_history.append(f"Assistant: {message.content}")
+            #     if len(last_msgs_history) == 2:
+            #         break
+            # last_msgs_history.reverse()
 
-            formatted_prompt = Prompts.chat_node_prompt.replace("{conversation_history}", str(last_msgs_history))
+            #formatted_prompt = Prompts.chat_node_prompt.replace("{conversation_history}", str(messages))
+
+            retrieved_data = state.get("retrieved_data",[])
             num_tasks = 0
 
-            if search_results and isinstance(search_results, dict):
-                num_tasks = search_results.get("count", 0)
+            if retrieved_data and isinstance(retrieved_data, dict):
+                num_tasks = retrieved_data.get("count", 0)
 
             if not user_intent or user_intent == "None":
                 user_intent = "Did not understand user intent"
             elif user_intent == "Statistics":
                 user_intent = f"User is asking for statistics about the ticketing system data. And the total found number is {num_tasks}"
-            formatted_prompt = formatted_prompt.replace("{user_intent}", user_intent)
-            #print(f"Formatted prompt for statistics node:\n{formatted_prompt}")
-            messages = [HumanMessage(content=formatted_prompt)]
+            elif user_intent == "Search":
+                user_intent = f"User is asking for Search about the ticketing system data. And the total found number is {num_tasks}"
+            print(f"{user_intent}")
+            formatted_prompt = Prompts.chat_node_prompt.replace("{user_intent}", str(user_intent))
+            print(formatted_prompt)
+            messages = [
+                SystemMessage(content=formatted_prompt),
+                *messages,
+            ]
+            
+            print(f"Formatted prompt for CHAT node:\n{str(messages)}")
+            # messages = [HumanMessage(content=formatted_prompt)]
         except Exception as e:
-            print(f"Exception while building messages for statistics node: {e}")
-            formatted_prompt = Prompts.statistics_node_prompt.replace("{conversation_history}", "failed to load history!")
-            messages = [HumanMessage(content=formatted_prompt)]
+            print(f"Exception while building messages for CHAT node: {e}")
+            # formatted_prompt = Prompts.statistics_node_prompt.replace("{user_intent}", "failed to load data!")
+            # messages = [HumanMessage(content=formatted_prompt)]
 
 
         try:
@@ -219,7 +236,7 @@ def chat(state: AppState):
         print(f"Chat response: {content_text}")
 
         
-        return {"messages": [content_text] , "search_results": search_results}
+        return {"messages": [AIMessage(content_text)] }
 
 ## ---------- Conditional edge functions -----------
 
@@ -231,7 +248,7 @@ def should_continue(state: AppState):
     user_intent = state.get("user_intent")
 
     if not user_intent or user_intent == "None":
-        return "end"
+        return "None"
 
     intent_map = {
         "Statistics": "Statistics",
@@ -240,7 +257,7 @@ def should_continue(state: AppState):
         "Operation": "Operation",
     }
     # returning the corresponding node based on user intent, if intent is not recognized return "end"
-    return intent_map.get(user_intent, "end")
+    return intent_map.get(user_intent, "None")
         
         
 def is_time_window_extraction_needed(state: AppState):

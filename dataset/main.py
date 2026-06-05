@@ -49,14 +49,14 @@ def search_tasks(request: SearchRequest):
 
     # Time filters
     if request.time_window:
-        if request.time_window.year:
-            result = result[result["year"] == request.time_window.year]
+        if request.time_window.year and request.time_window.year > 0:
+            result = result[result["create_year"] == request.time_window.year]
 
-        if request.time_window.month:
-            result = result[result["month"] == request.time_window.month]
+        if request.time_window.month and request.time_window.month > 0:
+            result = result[result["create_month"] == request.time_window.month]
 
-        if request.time_window.day:
-            result = result[result["day"] == request.time_window.day]
+        if request.time_window.day and request.time_window.day > 0:
+            result = result[result["create_day"] == request.time_window.day]
 
     return {
         "count": len(result),

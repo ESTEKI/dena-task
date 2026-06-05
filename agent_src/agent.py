@@ -23,8 +23,11 @@ class Agent():
         graph_builder.add_node("search_node",Nodes.search_node)
         graph_builder.add_node("statistics_node",Nodes.statistics_node)
         graph_builder.add_node("time_window_extractor_node",Nodes.time_window_extractor_node)
+        graph_builder.add_node("retrieve_data",Nodes.retrieve_data)
         graph_builder.add_node("chatbot",Nodes.chat)
         #graph_builder.add_node("tools", ٔTools.tool_node)
+
+        
         graph_builder.add_edge(START, "orchestrator")
         graph_builder.add_conditional_edges(
             "orchestrator",
@@ -43,12 +46,13 @@ class Agent():
             Nodes.is_time_window_extraction_needed,
             {
                 "time_window_extractor_node": "time_window_extractor_node",
-                "end": END
+                "end": "retrieve_data"
             }
         )
-
-        graph_builder.add_edge("time_window_extractor_node", "chatbot")
-        graph_builder.add_edge("search_node", "chatbot")
+        graph_builder.add_edge("time_window_extractor_node", "retrieve_data")
+        graph_builder.add_edge("search_node", "retrieve_data")
+        graph_builder.add_edge("retrieve_data", "chatbot")
+        #graph_builder.add_edge("search_node", "chatbot")
 
         # graph_builder.add_edge("tools", "chatbot")
 

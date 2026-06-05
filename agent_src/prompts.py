@@ -319,9 +319,11 @@ chat_node_prompt = """تو یک مدل هستی که وظیفه داری به س
  اما در صورتی که صرفا جست و جو Search  باشد باید صرفا بگی که موارد پیدا شده برایتان ارسال شد. 
  (وظیفه ارسال بر عهده تو نیست. فقط باید بگی که موارد پیدا شده برای کاربر ارسال شد.)
 
- here is the user conversation history that you receive:
-{conversation_history}
-and here is the user intent that you receive:
+
+** Important: and here is the user intent that you receive:
 {user_intent}
-You should generate an appropriate response to the user based on the conversation history and the user intent.
+You should generate an appropriate response to the user based on the conversation history.
  """
+
+# here is the user conversation history that you receive:
+# {conversation_history}
