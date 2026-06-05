@@ -139,11 +139,16 @@ def time_window_extractor_node(state: AppState):
         try:
             response = str_llm.invoke(messages)
             exact_time = Utils.calculate_date_offset(response.dict(exclude_none=False))
+            search_criteria["time_window"] = exact_time
+            print(f"=======Here is the modified Criteria: {search_criteria}")
+
             print(f"LLM response for time window extractor node:\n{response}")
         except Exception as e:
             print(f"Error in API call to LLM service for time window extractor node. msg: {e}")
             return {"time_window": None}
-        return {"time_window": exact_time}
+        
+        
+        return {"search_criteria": search_criteria}
 
 def retrieve_data(state: AppState):
         """
@@ -155,7 +160,9 @@ def retrieve_data(state: AppState):
 
         try:
             if search_criteria or time_window:
-                retrieved_data = Utils.call_database_api(search_criteria, time_window)
+                retrieved_data = Utils.call_database_api(search_criteria)
+                #retrieved_data = Utils.call_database_api(search_criteria, time_window)
+
                 print("API result:", retrieved_data)
         except Exception as e:
             print(f"Error calling API: {e}")

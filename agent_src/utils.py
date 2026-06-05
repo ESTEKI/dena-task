@@ -23,18 +23,20 @@ def calculate_date_offset(time_window: dict) -> dict:
         "month": result.month,
         "year": result.year,
     }
+#def call_database_api(search_criteria, time_window):
 
-def call_database_api(search_criteria, time_window):
+def call_database_api(search_criteria):
     url = "http://127.0.0.1:8008/search"
     
-    payload = {
-        "search_criteria": search_criteria,
-        "time_window": time_window
-    }
+    payload = search_criteria
+    # {
+    #     "search_criteria": search_criteria,
+    #     #"time_window": time_window
+    # }
     print("-----api call----------------")
     print("PAYLOAD:")
     print(payload)
-    print(type(time_window))
+    #print(type(time_window))
 #     payload = {
 #     "status": search_criteria.get("status"),
 #     "priority": search_criteria.get("priority"),
