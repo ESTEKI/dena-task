@@ -2,7 +2,7 @@
 A conversational agent for company tasks
 
 ## General architecture of the agent is as follows:
-![alt text](image.png)
+![alt text](image_graph.png)
 
 
 
