@@ -7,7 +7,13 @@ A conversational agent for company tasks
 
 
 ## Project Structure:
-# agent_src : 
+dena-task/
+├── agent_src/          # Agent implementation modules
+├── dataset/            # Data preparation and loading
+├── logs/               # Agent interaction logs
+├── main.py             # Entry point
+├── test_agent.ipynb    # Jupyter notebook for testing
+└── requirements.txt    # Dependencies
 --agent.py : a code to compile the graph and main interfaces (tryInvoke, plot)
 --basemodels.py: structure output of LLM in every node. 
 --llm_definition.py: API call to LLM
