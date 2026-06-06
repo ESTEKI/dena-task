@@ -74,14 +74,25 @@ Copy and paste it into your .env file
 
 ## 6. Usage
 6.1. Create a virtual environment using Anaconda (recommended)
-* Running the Agent API Server
+Using Conda:
+```bash
+conda create -n denatask python=3.11
+conda activate denatask
+```
+And
+```bash
+pip install -r requirements.txt
+```
+
+6.2 Run APIs
+- Running the Agent API Server 
 ```bash
 # Start the FastAPI server on localhost:8000
 uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 The server will be available at http://localhost:8000
 
-* Running the data bese API server 
+- Running the data bese API server (**in another cmd or terminal) 
 ```bash
 # Start the FastAPI server on localhost:8008
 uvicorn main:app --host 127.0.0.1 --port 8008
