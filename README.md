@@ -1,34 +1,72 @@
-# dena-task
-A conversational agent for company tasks
+# dena-task project
+dena-task is a conversational AI agent built to handle company tasks in a natural language interface.
 
-## General architecture of the agent is as follows:
+## 1.Features
+- Handles multi-turn conversations
+- Reads data base (.csv) file via an API call from  http://127.0.0.1:8008/search end point.
+- Reports Statistics data and Searchs for queries from user input message.
+- Uses a workflow conversation management technique to evaluate user intent (search or statistics), extract query entities (e.g. full name, department, time window), and then retrieves data and reports back. 
+- Stateful Conversations, keeps all the human and responses related to each session in a conversation via agent State. 
+- FastAPI-based HTTP endpoints for integration and error handling
+
+## 2. General architecture of the agent is as follows:
 ![alt text](image_graph.png)
 
-
-
-## Project Structure:
+## 3.Project Structure:
 dena-task/
-├── agent_src/          # Agent implementation modules
-├── dataset/            # Data preparation and loading
-├── logs/               # Agent interaction logs
-├── main.py             # Entry point
-├── test_agent.ipynb    # Jupyter notebook for testing
-└── requirements.txt    # Dependencies
---agent.py : a code to compile the graph and main interfaces (tryInvoke, plot)
---basemodels.py: structure output of LLM in every node. 
---llm_definition.py: API call to LLM
-     I used GroqAI playground cloud service, First, its FREE, second, powerfull models available. I used gpt-oss-120B 
-     very good understanding of the Persian language. Fast, because it is Mixture-of-Expert model.
---logger.py: logging the chatbot output.
---nodes.py: Complete list of nodes used in this project.
---prompts.py: Prompts used in LLM calls. 
---tools.py: Empty for now. Unfortunately, I couldnt manage to do all the demo requirments and its not complete.
---utils.py: helper functions such as descriptive time formats to exact day, month and year.
+├── agent_src/
+│   ├── __init__.py
+│   ├── agent.py              # Main agent graph compilation and interfaces
+│   ├── basemodels.py         # Pydantic models for LLM output structure
+│   ├── llm_definition.py     # GroqAI LLM initialization and configurationI used GroqAI playground cloud service, First, its FREE,
+│   │                             second, powerfull models available. I used gpt-oss-120B. Very good understanding of the Persian language, │   │                             and Fast. It is a Mixture-of-Expert model.
+│   ├── logger.py             # logging the chatbot output.
+│   ├── nodes.py              # Agent graph nodes implementation
+│   ├── prompts.py            # System and user prompts for LLM
+│   ├── tools.py              # Tool definitions for agent (in development), no tool use implemented for Search and Statistics tasks. Will be 
+│   │                             added next.
+│   └── utils.py              # Helper functions (date parsing, formatting)
+├── dataset/
+│   └── main.py               # Dataset API and data filtering logic
+│   └── data_prep.py          # Dataset merging and tests on data
+├── logs/                     # Agent interaction logs
+├── main.py                   # FastAPI application and REST endpoints
+├── test_agent.ipynb          # Jupyter notebook for testing and experimentation
+├── requirements.txt          # Python dependencies
+├── .env                      # Environment variables (API keys) (excluded from git for security purposes)
+├── .gitignore
+├── image_graph.png           # Architecture diagram
+└── README.md
 
-# dataset
-Files needed for data prep and loading. It is still needs some working. 
+## 4. Dataset Configuration
+The agent uses task data from a CSV file. Searching the data file includes the following columns:
 
+status: Task status (open, closed, in_progress, etc.)
+priority: Task priority (critical, high, medium, low)
+fullname: Name of the person assigned
+department: Department name
+assignee_id: Unique identifier for assignee
+create_year, create_month, create_day: Task creation date components, when given, all values AFTER these parameters are retrieved.
 
+Note: The dataset module is still under development and may require additional configuration.
+
+## 5. Configuration
+1. Set up your GroqAI API key
+Create a .env file in the project root with your GroqAI credentials:
+
+Create a `.env` file in the project root with your GroqAI credentials:
+
+```env
+api-key = "your_groq_api_key_here"
+base-url = "https://api.groq.com/openai/v1"
+
+To get a free API key:
+
+Visit console.groq.com
+Sign up or log in
+Navigate to API Keys section
+Generate a new API key
+Copy and paste it into your .env file
 ## Some Demo outputs from logs file:
 2026-06-04 01:40:26,864 [Agent] [INFO] Graph response: {'messages': [HumanMessage(content='تسکهای باز محمد رضایی را نشان بده', additional_kwargs={}, response_metadata={}, id='4abb1b17-8380-43f5-9ac3-2b9447e16b54')], 'user_intent': 'Search', 'search_criteria': {'status': 'Open', 'fullname': 'محمد رضایی'}}
 
