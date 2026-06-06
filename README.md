@@ -44,12 +44,19 @@ dena-task/
 ## 4. Dataset Configuration
 The agent uses task data from a CSV file. Searching the data file includes the following columns:
 
+
 status: Task status (open, closed, in_progress, etc.)
+
 priority: Task priority (critical, high, medium, low)
+
 fullname: Name of the person assigned
+
 department: Department name
+
 assignee_id: Unique identifier for assignee
+
 create_year, create_month, create_day: Task creation date components, when given, all values AFTER these parameters are retrieved.
+
 
 Note: The dataset module is still under development and may require additional configuration.
 
@@ -67,10 +74,15 @@ base-url = "https://api.groq.com/openai/v1"
 To get a free API key:
 
 Visit console.groq.com
+
 Sign up or log in
+
 Navigate to API Keys section
+
 Generate a new API key
+
 Copy and paste it into your .env file
+
 
 ## 6. Usage
 6.1. Create a virtual environment using Anaconda (recommended)
