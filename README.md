@@ -13,6 +13,8 @@ dena-task is a conversational AI agent built to handle company tasks in a natura
 ![alt text](image_graph.png)
 
 ## 3.Project Structure:
+```text
+
 dena-task/
 ├── agent_src/
 │   ├── __init__.py
@@ -37,6 +39,7 @@ dena-task/
 ├── .gitignore
 ├── image_graph.png           # Architecture diagram
 └── README.md
+```
 
 ## 4. Dataset Configuration
 The agent uses task data from a CSV file. Searching the data file includes the following columns:
