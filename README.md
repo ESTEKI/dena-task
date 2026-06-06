@@ -111,18 +111,107 @@ uvicorn main:app --host 127.0.0.1 --port 8008
 ```
 The server will be available at http://localhost:8000
 
+## 7. API Endpoints
+Health Check
+```bash
+GET /
+```
+Response:
 
-## Some Demo outputs from logs file:
-2026-06-04 01:40:26,864 [Agent] [INFO] Graph response: {'messages': [HumanMessage(content='تسکهای باز محمد رضایی را نشان بده', additional_kwargs={}, response_metadata={}, id='4abb1b17-8380-43f5-9ac3-2b9447e16b54')], 'user_intent': 'Search', 'search_criteria': {'status': 'Open', 'fullname': 'محمد رضایی'}}
+```JSON
+{
+  "status": "ok",
+  "message": "TaskAgent API is running"
+}
+```
+Chat with Agent
+
+```bash
+POST /chat
+```
+Request body:
+
+```JSON
+{
+  "conversation_id": "s102030",
+  "message": "تسکهای باز محمد رضایی را نشان بده"
+}
+
+```
+Response:
+
+```JSON
+{
+  "conversation_id": "s102030",
+  "agent_response": "...",
+  "last_ai_message": "تسک های باز محمد رضایی برای شما ارسال شد.",
+  "retrieved_data": {
+    "tasks": [...],
+    "count": 5
+  }
+}
+```
+## 8. Example Queries
+```JSON
+{
+  "conversation_id": "s110022030",
+  "message": "تسک های مهدی قنبری رو نشون بده"
+}
+```
 
 
-2026-06-04 16:39:54,148 [Agent] [INFO] Graph response: {'messages': [HumanMessage(content='چند تسک حیاتی تو دوماه گذشته داریم؟', additional_kwargs={}, response_metadata={}, id='e187632b-dd4a-4562-9628-b1333108e5aa')], 'user_intent': 'Statistics', 'search_criteria': {'time_window': 'دوماه گذشته', 'priority': 'Critical'}}
+```JSON
+{
+  "conversation_id": "s110022030",
+  "message": "تو سه ماه اخیر"
+}
+```
 
 
+RESPONSE to last request:
+```JSON
+{
+  "conversation_id": "s110022030",
+  "agent_response": "{'messages': [HumanMessage(content='تسک های مهدی قنبری رو نشون بده', additional_kwargs={}, response_metadata={}, id='68a83b60-aa80-40dd-9a1a-c052b1ecbaa3'), AIMessage(content='موارد پیدا شده برای شما ارسال شد.', additional_kwargs={}, response_metadata={}, id='5f8f46cb-b9ce-4e6c-8a32-c47e8a7cd447', tool_calls=[], invalid_tool_calls=[]), HumanMessage(content='تو سه ماه اخیر', additional_kwargs={}, response_metadata={}, id='be95b5d7-ba6c-4d56-9749-cf498f117740'), AIMessage(content='در بازهٔ سه ماه اخیر، تعداد تسک\\u200cهای مربوط به مهدی قنبری **۲** عدد می\\u200cباشد.', additional_kwargs={}, response_metadata={}, id='c9efe190-87b8-4dde-ab48-fd82863ad703', tool_calls=[], invalid_tool_calls=[])], 'user_intent': 'Search', 'search_criteria': {'time_window': {'day': 6, 'month': 3, 'year': 2026}, 'fullname': 'مهدی قنبری'}, 'retrieved_data': {'count': 2, 'data': [{'Unnamed: 0': 70, 'id': 71, 'title': 'تهیه گزارش عملکرد فصل بهار', 'description': 'ارزیابی خروجی تیم ها', 'create_time': '2026-05-12', 'status': 'Done', 'assignee_id': 21, 'priority': 'Low', 'due_time': '2026/05/30', 'fullname': 'مهدی قنبری', 'department': 'مدیریت', 'create_year': 2026, 'create_month': 5, 'create_day': 12}, {'Unnamed: 0': 120, 'id': 121, 'title': 'بررسی عملکرد مدیران پروژه', 'description': 'تحلیل وضعیت پیشرفت پروژه ها', 'create_time': '2026-06-21', 'status': 'Done', 'assignee_id': 21, 'priority': 'Low', 'due_time': '2026/07/02', 'fullname': 'مهدی قنبری', 'department': 'مدیریت', 'create_year': 2026, 'create_month': 6, 'create_day': 21}]}}",
+  "last_ai_message": "در بازهٔ سه ماه اخیر، تعداد تسک‌های مربوط به مهدی قنبری **۲** عدد می‌باشد.",
+  "retrieved_data": {
+    "count": 2,
+    "data": [
+      {
+        "Unnamed: 0": 70,
+        "id": 71,
+        "title": "تهیه گزارش عملکرد فصل بهار",
+        "description": "ارزیابی خروجی تیم ها",
+        "create_time": "2026-05-12",
+        "status": "Done",
+        "assignee_id": 21,
+        "priority": "Low",
+        "due_time": "2026/05/30",
+        "fullname": "مهدی قنبری",
+        "department": "مدیریت",
+        "create_year": 2026,
+        "create_month": 5,
+        "create_day": 12
+      },
+      {
+        "Unnamed: 0": 120,
+        "id": 121,
+        "title": "بررسی عملکرد مدیران پروژه",
+        "description": "تحلیل وضعیت پیشرفت پروژه ها",
+        "create_time": "2026-06-21",
+        "status": "Done",
+        "assignee_id": 21,
+        "priority": "Low",
+        "due_time": "2026/07/02",
+        "fullname": "مهدی قنبری",
+        "department": "مدیریت",
+        "create_year": 2026,
+        "create_month": 6,
+        "create_day": 21
+      }
+    ]
+  }
+}
 
-2026-06-04 17:47:35,559 [Agent] [INFO] Graph response: {'messages': [HumanMessage(content='چند تسک حیاتی تو دوماه گذشته داریم؟', additional_kwargs={}, response_metadata={}, id='71aede88-01a1-481c-8f75-9b0293ec7d5b')], 'user_intent': 'Statistics', 'search_criteria': {'time_window': 'دوماه گذشته', 'priority': 'High'}, 'time_window': {'days': 0, 'months': 2, 'years': 0}}
-2026-06-04 18:04:07,310 [Agent] [INFO] Graph compiled successfully.
-
-## In this example, the actual date is extracted. Month from 6 to 4. 
-2026-06-04 18:04:14,178 [Agent] [INFO] Graph response: {'messages': [HumanMessage(content='چند تسک حیاتی تو دوماه گذشته داریم؟', additional_kwargs={}, response_metadata={}, id='9bff2d6e-1e70-4217-b582-78f78cce4c30')], 'user_intent': 'Statistics', 'search_criteria': {'time_window': 'دوماه گذشته', 'priority': 'Critical'}, 'time_window': {'day': 4, 'month': 4, 'year': 2026}} 
+```
 
