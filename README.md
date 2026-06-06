@@ -62,6 +62,7 @@ Create a `.env` file in the project root with your GroqAI credentials:
 ```env
 api-key = "your_groq_api_key_here"
 base-url = "https://api.groq.com/openai/v1"
+```
 
 To get a free API key:
 
@@ -70,6 +71,24 @@ Sign up or log in
 Navigate to API Keys section
 Generate a new API key
 Copy and paste it into your .env file
+
+## 6. Usage
+6.1. Create a virtual environment using Anaconda (recommended)
+* Running the Agent API Server
+```bash
+# Start the FastAPI server on localhost:8000
+uvicorn main:app --host 127.0.0.1 --port 8000
+```
+The server will be available at http://localhost:8000
+
+* Running the data bese API server 
+```bash
+# Start the FastAPI server on localhost:8008
+uvicorn main:app --host 127.0.0.1 --port 8008
+```
+The server will be available at http://localhost:8000
+
+
 ## Some Demo outputs from logs file:
 2026-06-04 01:40:26,864 [Agent] [INFO] Graph response: {'messages': [HumanMessage(content='تسکهای باز محمد رضایی را نشان بده', additional_kwargs={}, response_metadata={}, id='4abb1b17-8380-43f5-9ac3-2b9447e16b54')], 'user_intent': 'Search', 'search_criteria': {'status': 'Open', 'fullname': 'محمد رضایی'}}
 
